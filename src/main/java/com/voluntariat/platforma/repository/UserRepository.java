@@ -10,4 +10,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // .save(user) -> salveaza
     // .findAll() -> gaseste toti utilizatorii
     // Nu trebuie sa scriem noi cod SQL!
+
+    User findByEmail(String email);
 }

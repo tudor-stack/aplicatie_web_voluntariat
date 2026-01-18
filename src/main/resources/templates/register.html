@@ -15,6 +15,11 @@
                     <h3 class="text-center">Creare Cont</h3>
                 </div>
                 <div class="card-body">
+
+                    <div th:if="${param.success}" class="alert alert-success text-center">
+                        Cont creat cu succes! Te poți autentifica acum.
+                    </div>
+
                     <form th:action="@{/register}" th:object="${user}" method="post">
 
                         <div class="mb-3">
@@ -37,21 +42,58 @@
                             <input type="password" class="form-control" th:field="*{password}" required>
                         </div>
 
+                        <div id="companyFields" style="display: none;">
+                            <hr class="my-4">
+                            <h5 class="text-primary mb-3">Detalii Organizație</h5>
+
+                            <div class="mb-3">
+                                <label class="form-label">Nume Organizație</label>
+                                <input type="text" class="form-control" name="companyName" id="inputCompanyName" placeholder="Numele Asociației">
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">CUI</label>
+                                <input type="text" class="form-control" name="cui" id="inputCui" placeholder="Cod Unic de Înregistrare">
+                            </div>
+                            <hr class="my-4">
+                        </div>
                         <div class="mb-3">
-                            <label class="form-label">Rol</label>
-                            <select class="form-select" th:field="*{role}">
+                            <label class="form-label fw-bold">Selectează Tipul de Cont</label>
+                            <select class="form-select border-primary" th:field="*{role}" id="roleSelect" onchange="toggleCompanyFields()">
                                 <option value="VOLUNTAR">Vreau sa fiu Voluntar</option>
                                 <option value="ORGANIZATOR">Suntem o Organizatie</option>
                             </select>
                         </div>
 
-                        <button type="submit" class="btn btn-primary w-100">Inregistreaza-te</button>
+                        <button type="submit" class="btn btn-primary w-100 mt-3">Inregistreaza-te</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    function toggleCompanyFields() {
+        var role = document.getElementById("roleSelect").value;
+        var fields = document.getElementById("companyFields");
+        var inputName = document.getElementById("inputCompanyName");
+        var inputCui = document.getElementById("inputCui");
+
+        if (role === "ORGANIZATOR") {
+            fields.style.display = "block"; // Arată câmpurile (împinge formularul în jos)
+            inputName.required = true;
+            inputCui.required = true;
+        } else {
+            fields.style.display = "none";  // Ascunde câmpurile (trage formularul în sus)
+            inputName.required = false;
+            inputCui.required = false;
+
+            inputName.value = "";
+            inputCui.value = "";
+        }
+    }
+</script>
 
 </body>
 </html>
