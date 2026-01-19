@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ro" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Companie</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-dark bg-primary mb-4">
+    <div class="container">
+        <span class="navbar-brand mb-0 h1" th:text="'Panou Control - ' + ${companyName}">Panou</span>
+        <form th:action="@{/logout}" method="post" class="d-flex">
+            <button type="submit" class="btn btn-light btn-sm fw-bold">
+                Deconectare
+            </button>
+        </form>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-header bg-success text-white">
+                    Adaugă Eveniment Nou
+                </div>
+                <div class="card-body">
+                    <form th:action="@{/company/add-event}" th:object="${newEvent}" method="post">
+
+                        <div class="mb-3">
+                            <label>Titlu Eveniment</label>
+                            <input type="text" class="form-control" th:field="*{title}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label>Descriere</label>
+                            <textarea class="form-control" th:field="*{description}" rows="3"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label>Data Început</label>
+                            <input type="date" class="form-control" th:field="*{startDate}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label>Data Final</label>
+                            <input type="date" class="form-control" th:field="*{endDate}" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-success w-100">Publică Anunț</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <h3 class="mb-3">Evenimentele Tale</h3>
+
+            <div th:if="${listaEvenimente.empty}" class="alert alert-info">
+                Nu ai creat încă niciun eveniment. Folosește formularul din stânga!
+            </div>
+
+            <div th:each="event : ${listaEvenimente}" class="card shadow-sm mb-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <h5 class="card-title text-primary" th:text="${event.title}">Titlu Eveniment</h5>
+
+                        <span class="badge bg-secondary">
+                            <span th:text="${event.startDate}">Start</span> ->
+                            <span th:text="${event.endDate}">End</span>
+                        </span>
+                    </div>
+
+                    <p class="card-text mt-2" th:text="${event.description}">Descriere...</p>
+
+                    <div class="mt-2">
+                        <button class="btn btn-sm btn-outline-warning">Editează</button>
+                        <button class="btn btn-sm btn-outline-danger">Șterge</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
