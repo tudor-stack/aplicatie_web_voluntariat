@@ -27,6 +27,9 @@ public class VolunteerApplication {
     private LocalDateTime applicationDate;
     private String status;  //Pending | Accepted | rejected
 
+    public VolunteerApplication() {
+    }
+
     public VolunteerApplication(User volunteer, Event event) {
         this.volunteer=volunteer;
         this.event=event;
@@ -53,4 +56,15 @@ public class VolunteerApplication {
     public String getStatus() {return status;}
 
     public void setStatus(String status) {this.status = status;}
+    // Adaugă asta în VolunteerApplication.java, jos de tot
+    @Override
+    public String toString() {
+        return "VolunteerApplication{" +
+                "id=" + id +
+                ", status='" + status + '\'' +
+                // IMPORTANT: Putem pune ID-urile, dar nu obiectele întregi
+                ", eventId=" + (event != null ? event.getId() : "null") +
+                ", volunteerId=" + (volunteer != null ? volunteer.getId() : "null") +
+                '}';
+    }
 }

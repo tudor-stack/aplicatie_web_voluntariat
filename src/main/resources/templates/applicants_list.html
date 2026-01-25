@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Gestionare Aplicanți</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body class="bg-light p-4">
+
+<div class="container">
+    <div class="d-flex justify-content-between mb-4">
+        <h2>Aplicanți</h2>
+        <a href="/company/dashboard" class="btn btn-secondary">Înapoi</a>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th>Nume</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Acțiuni</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="app : ${applications}">
+                    <td>
+                        <span th:if="${app.volunteer != null}" th:text="${app.volunteer.firstName + ' ' + app.volunteer.lastName}"></span>
+                        <span th:unless="${app.volunteer != null}">-</span>
+                    </td>
+                    <td th:text="${app.volunteer != null ? app.volunteer.email : 'N/A'}">email</td>
+                    <td th:text="${app.status}">PENDING</td>
+                    <td>
+                        <div class="d-flex gap-2">
+                            <form th:action="@{/company/application/{id}/status(id=${app.id})}" method="post">
+                                <input type="hidden" name="status" value="ACCEPTED" />
+                                <button type="submit" class="btn btn-sm btn-success">Acceptă</button>
+                            </form>
+
+                            <form th:action="@{/company/application/{id}/status(id=${app.id})}" method="post">
+                                <input type="hidden" name="status" value="REJECTED" />
+                                <button type="submit" class="btn btn-sm btn-danger">Respinge</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

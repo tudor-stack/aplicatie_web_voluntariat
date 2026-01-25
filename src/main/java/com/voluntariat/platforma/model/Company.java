@@ -31,6 +31,18 @@ public class Company {
         this.user = user;
     }
 
+    public Company(String companyName, String description, String website, String address, String cui, User user) {
+        this.companyName = companyName;
+        this.description = description;
+        this.website = website;
+        this.address = address;
+        this.cui = cui;
+        this.user = user;
+    }
+
+    public Company(String name, String desc, String contact, User u) {
+    }
+
     public Long getId() {
         return id;
     }

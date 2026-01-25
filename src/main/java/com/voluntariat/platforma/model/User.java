@@ -22,10 +22,14 @@ public class User {
     @Column(nullable = false)
     private String lastName;
 
+
     private String role;
 
     public User() {
     }
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private VolunteerProfile volunteerProfile;
 
     public User(String email, String password, String firstName, String lastName, String role) {
         this.email = email;
@@ -33,6 +37,14 @@ public class User {
         this.firstName = firstName;
         this.lastName = lastName;
         this.role = role;
+    }
+
+    public VolunteerProfile getVolunteerProfile() {
+        return volunteerProfile;
+    }
+
+    public void setVolunteerProfile(VolunteerProfile volunteerProfile) {
+        this.volunteerProfile = volunteerProfile;
     }
 
     // Getters si Setters
