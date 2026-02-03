@@ -36,11 +36,12 @@ git clone [https://github.com/tudor-stack/your-repo-name.git](https://github.com
 cd your-repo-name
 
 ### 2. Instal dependencies
-
+```bash
 nmp install
 
 
 ### 3. Enviroment configuration
+```bash
 Create a .env file in your project and add the followings:
 
 DATABASE_URL=your_db_url
