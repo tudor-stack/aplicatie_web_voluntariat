@@ -35,10 +35,13 @@ To run the project locally, follow the steps below:
 git clone [https://github.com/tudor-stack/your-repo-name.git](https://github.com/tudor-stack/your-repo-name.git)
 cd your-repo-name
 
+---
+
 ### 2. Instal dependencies
 ```bash
 nmp install
 
+---
 
 ### 3. Enviroment configuration
 ```bash
