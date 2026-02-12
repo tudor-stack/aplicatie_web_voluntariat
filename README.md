@@ -1,4 +1,4 @@
-# 🤝 Volunteering Management Platform
+## 🤝 Volunteering Management Platform
 
 A robust Full-Stack application developed to facilitate the connection between volunteers and event organizers. The project manages the complete lifecycle of a volunteering activity, from event creation to enrollment and the review system.
 
@@ -49,3 +49,4 @@ Create a .env file in your project and add the followings:
 
 DATABASE_URL=your_db_url
 API_KEY=your_secret_key
+](https://github.com/tudor-stack/aplicatie_web_voluntariat)
