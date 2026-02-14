@@ -57,4 +57,6 @@ public class Review {
     public void setEvent(Event event) { this.event = event; }
     public String getType() { return type; }
     public void setType(String type) { this.type = type; }
+
+
 }

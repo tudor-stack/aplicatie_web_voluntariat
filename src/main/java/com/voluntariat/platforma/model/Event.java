@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import com.voluntariat.platforma.model.VolunteerApplication;
 
 @Entity
-@Table(name="Eveniments")
+@Table(name="Events")
 public class Event {
 
     @Id
@@ -26,7 +26,7 @@ public class Event {
 
     // Importă: import jakarta.persistence.FetchType;
 
-    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<VolunteerApplication> applications = new ArrayList<>();
 
 

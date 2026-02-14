@@ -7,56 +7,88 @@
 </head>
 <body class="bg-light">
 
-<nav class="navbar navbar-dark bg-success mb-4">
+<nav class="navbar navbar-dark bg-success mb-4 sticky-top shadow">
     <div class="container">
-        <span class="navbar-brand">📅 Evenimentele Mele (Confirmate)</span>
+        <span class="navbar-brand fw-bold">📅 Evenimentele Mele</span>
         <a href="/jobs" class="btn btn-outline-light btn-sm">⬅ Înapoi la Lista Joburi</a>
     </div>
 </nav>
 
 <div class="container">
 
-    <div th:if="${acceptedApps.empty}" class="alert alert-warning text-center">
-        Nu ai niciun eveniment confirmat momentan. Aplică la joburi și așteaptă răspunsul companiilor!
+    <div class="d-flex align-items-center mb-3 mt-4">
+        <h3 class="text-success me-2">🚀 Urmează să participi</h3>
+        <span class="badge bg-success rounded-pill" th:text="${upcomingApps.size()}">0</span>
+    </div>
+
+    <div th:if="${upcomingApps.empty}" class="alert alert-light border border-success text-center shadow-sm">
+        Nu ești înscris la niciun eveniment viitor. <a href="/jobs" class="fw-bold text-success">Găsește oportunități noi!</a>
     </div>
 
     <div class="row">
-        <div th:each="app : ${acceptedApps}" class="col-md-6">
-            <div class="card shadow-sm mb-4 border-success">
-                <div class="card-header bg-success text-white">
-                    <h5 class="mb-0" th:text="${app.event.title}">Titlu</h5>
+        <div th:each="app : ${upcomingApps}" class="col-md-6">
+            <div class="card shadow-sm mb-4 border-success h-100">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 text-truncate" th:text="${app.event.title}">Titlu</h5>
+                    <small class="badge bg-light text-success">ÎNSCRIS</small>
                 </div>
-                <div class="card-body">
-                    <p><strong>Companie:</strong> <span th:text="${app.event.company.companyName}">Nume</span></p>
-                    <p><strong>Perioada:</strong>
-                        <span th:text="${app.event.startDate}">Start</span> -
-                        <span th:text="${app.event.endDate}">End</span>
-                    </p>
-                    <p class="card-text" th:text="${app.event.description}">Descriere</p>
+                <div class="card-body d-flex flex-column">
+                    <p class="mb-1"><strong>🏢 Companie:</strong> <span th:text="${app.event.company.companyName}">Nume</span></p>
+                    <p class="mb-1"><strong>📅 Start:</strong> <span th:text="${app.event.startDate}" class="text-primary fw-bold">Data</span></p>
+                    <p class="mb-3"><strong>📍 Descriere:</strong> <span th:text="${#strings.abbreviate(app.event.description, 100)}">Descriere...</span></p>
 
-                    <hr />
-
-                    <div class="alert alert-light border">
-                        ✅ <strong>Status:</strong> Ești așteptat să participi!
-                        <br /> <small class="text-muted">Te rugăm să ajungi la timp.</small>
-                    </div>
-                    <div class="mt-3">
-                        <a th:if="${app.event.endDate.isBefore(T(java.time.LocalDate).now())}"
-                           th:href="@{/volunteer/review-event/{id}(id=${app.event.id})}"
-                           class="btn btn-warning w-100">
-                            ⭐ Lasă o Recenzie
-                        </a>
-
-                        <span th:unless="${app.event.endDate.isBefore(T(java.time.LocalDate).now())}"
-                              class="text-muted small">
-       Poți lăsa recenzie după finalizarea evenimentului.
-    </span>
+                    <div class="mt-auto">
+                        <div class="alert alert-warning py-2 small border mb-0">
+                            ⏳ <strong>Status:</strong> Ești așteptat să participi!
+                            <br/>Recenzia se poate lăsa după finalizare.
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <hr class="my-5 border-2" />
+
+    <div class="d-flex align-items-center mb-3">
+        <h3 class="text-secondary me-2">📜 Istoric Activitate</h3>
+        <span class="badge bg-secondary rounded-pill" th:text="${historyApps.size()}">0</span>
+    </div>
+
+    <div th:if="${historyApps.empty}" class="text-center text-muted py-3">
+        <p>Nu ai participat încă la niciun eveniment trecut.</p>
+    </div>
+
+    <div class="row">
+        <div th:each="app : ${historyApps}" class="col-md-6">
+            <div class="card shadow-sm mb-4 border-secondary h-100 opacity-75 bg-light">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0 text-decoration-line-through" th:text="${app.event.title}">Titlu Vechi</h5>
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <p class="mb-1"><strong>Companie:</strong> <span th:text="${app.event.company.companyName}">Nume</span></p>
+                    <p class="mb-3"><strong>S-a încheiat pe:</strong> <span th:text="${app.event.endDate}" class="text-danger">Data</span></p>
+
+                    <div class="mt-auto">
+                        <div class="alert alert-light border py-2 mb-3">
+                            ✅ <strong>Eveniment Finalizat</strong>
+                        </div>
+
+                        <a th:href="@{/volunteer/review-event/{id}(id=${app.event.id})}"
+                           class="btn btn-outline-primary w-100">
+                            ⭐ Lasă o Recenzie
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
+
+<footer class="text-center py-4 text-muted mt-5">
+    <small>Platforma Voluntariat &copy; 2026</small>
+</footer>
 
 </body>
 </html>

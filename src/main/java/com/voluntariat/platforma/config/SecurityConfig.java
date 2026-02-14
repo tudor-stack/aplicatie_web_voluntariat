@@ -16,14 +16,13 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    // 1. Definim PasswordEncoder (pentru a verifica parolele criptate)
+    // password encoder
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // 2. AICI ESTE MAGICUL: Definim UserDetailsService direct aici, fara fisier separat!
-    // Aceasta metoda ii spune lui Spring cum sa gaseasca userul in baza ta de date.
+    // Gasirea userului in DB
     @Bean
     public UserDetailsService userDetailsService(UserRepository userRepository) {
         return email -> {
@@ -48,11 +47,10 @@ public class SecurityConfig {
                         .requestMatchers("/", "/register", "/login", "/css/**", "/js/**").permitAll() // Rute publice
                         .anyRequest().authenticated()
                 )
+                // În SecurityConfig.java
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .loginProcessingUrl("/login")
-                        .defaultSuccessUrl("/", true)
-                        //.usernameParameter("email")
+                        .defaultSuccessUrl("/", true) // "true" forțează redirecționarea către metoda de mai sus
                         .permitAll()
                 )
                 .logout(logout -> logout

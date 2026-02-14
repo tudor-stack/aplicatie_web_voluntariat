@@ -19,27 +19,49 @@
                     <div th:if="${param.success}" class="alert alert-success text-center">
                         Cont creat cu succes! Te poți autentifica acum.
                     </div>
+                    <div th:if="${error}" class="alert alert-danger text-center" th:text="${error}">
+                    </div>
 
-                    <form th:action="@{/register}" th:object="${user}" method="post">
+                    <form th:action="@{/register}" th:object="${userDto}" method="post">
 
                         <div class="mb-3">
                             <label class="form-label">Prenume</label>
-                            <input type="text" class="form-control" th:field="*{firstName}" placeholder="Ex: Ion" required>
+                            <input type="text" class="form-control" th:field="*{firstName}"
+                                   th:classappend="${#fields.hasErrors('firstName')} ? 'is-invalid' : ''"
+                                   placeholder="Ex: Ion">
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></div>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Nume</label>
-                            <input type="text" class="form-control" th:field="*{lastName}" placeholder="Ex: Popescu" required>
+                            <input type="text" class="form-control" th:field="*{lastName}"
+                                   th:classappend="${#fields.hasErrors('lastName')} ? 'is-invalid' : ''"
+                                   placeholder="Ex: Popescu">
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></div>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Email</label>
-                            <input type="email" class="form-control" th:field="*{email}" placeholder="email@exemplu.com" required>
+                            <input type="email" class="form-control" th:field="*{email}"
+                                   th:classappend="${#fields.hasErrors('email')} ? 'is-invalid' : ''"
+                                   placeholder="email@exemplu.com">
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Parola</label>
-                            <input type="password" class="form-control" th:field="*{password}" required>
+                            <input type="password" class="form-control" th:field="*{password}"
+                                   th:classappend="${#fields.hasErrors('password')} ? 'is-invalid' : ''">
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+                            <small class="text-muted">Minim 8 caractere, litere și cifre.</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Selectează Tipul de Cont</label>
+                            <select class="form-select border-primary" th:field="*{role}" id="roleSelect" onchange="toggleCompanyFields()">
+                                <option value="Volunteer">Vreau sa fiu Voluntar</option>
+                                <option value="Company">Suntem o Organizatie</option>
+                            </select>
                         </div>
 
                         <div id="companyFields" style="display: none;">
@@ -48,21 +70,20 @@
 
                             <div class="mb-3">
                                 <label class="form-label">Nume Organizație</label>
-                                <input type="text" class="form-control" name="companyName" id="inputCompanyName" placeholder="Numele Asociației">
+                                <input type="text" class="form-control" id="inputCompanyName" th:field="*{companyName}"
+                                       th:classappend="${#fields.hasErrors('companyName')} ? 'is-invalid' : ''"
+                                       placeholder="Numele Asociației">
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('companyName')}" th:errors="*{companyName}"></div>
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label">CUI</label>
-                                <input type="text" class="form-control" name="cui" id="inputCui" placeholder="Cod Unic de Înregistrare">
+                                <input type="text" class="form-control" id="inputCui" th:field="*{cui}"
+                                       th:classappend="${#fields.hasErrors('cui')} ? 'is-invalid' : ''"
+                                       placeholder="Cod Unic de Înregistrare">
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('cui')}" th:errors="*{cui}"></div>
                             </div>
                             <hr class="my-4">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Selectează Tipul de Cont</label>
-                            <select class="form-select border-primary" th:field="*{role}" id="roleSelect" onchange="toggleCompanyFields()">
-                                <option value="VOLUNTAR">Vreau sa fiu Voluntar</option>
-                                <option value="ORGANIZATOR">Suntem o Organizatie</option>
-                            </select>
                         </div>
 
                         <button type="submit" class="btn btn-primary w-100 mt-3">Inregistreaza-te</button>
@@ -77,22 +98,22 @@
     function toggleCompanyFields() {
         var role = document.getElementById("roleSelect").value;
         var fields = document.getElementById("companyFields");
-        var inputName = document.getElementById("inputCompanyName");
-        var inputCui = document.getElementById("inputCui");
+        // Nu mai modificăm 'required' aici, ne bazăm pe validarea din Java (Backend)
+        // pentru securitate, dar păstrăm logica vizuală.
 
         if (role === "ORGANIZATOR") {
-            fields.style.display = "block"; // Arată câmpurile (împinge formularul în jos)
-            inputName.required = true;
-            inputCui.required = true;
+            fields.style.display = "block";
         } else {
-            fields.style.display = "none";  // Ascunde câmpurile (trage formularul în sus)
-            inputName.required = false;
-            inputCui.required = false;
-
-            inputName.value = "";
-            inputCui.value = "";
+            fields.style.display = "none";
         }
     }
+
+    // Apelează funcția la încărcarea paginii
+    // Astfel, dacă pagina se reîncarcă cu erori și "ORGANIZATOR" e selectat,
+    // câmpurile rămân vizibile!
+    document.addEventListener("DOMContentLoaded", function() {
+        toggleCompanyFields();
+    });
 </script>
 
 </body>

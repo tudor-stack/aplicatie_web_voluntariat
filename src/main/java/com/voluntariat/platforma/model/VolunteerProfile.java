@@ -1,7 +1,7 @@
 package com.voluntariat.platforma.model;
 import jakarta.persistence.*;
 
-@Entity@Table(name="volunteer_profile")
+@Entity@Table(name="volunteer_profiles")
 public class VolunteerProfile {
 
     @Id

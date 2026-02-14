@@ -1,49 +1,50 @@
 <!DOCTYPE html>
 <html lang="ro" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8" />
-    <title>Lasă o Recenzie</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <style>
-        .rating { display: flex; flex-direction: row-reverse; justify-content: center; }
-        .rating > input { display: none; }
-        .rating > label { position: relative; width: 1.1em; font-size: 2rem; color: #FFD700; cursor: pointer; }
-        .rating > label::before { content: "\2605"; position: absolute; opacity: 0; }
-        .rating > label:hover:before, .rating > label:hover ~ label:before { opacity: 1 !important; }
-        .rating > input:checked ~ label:before { opacity: 1; }
-        .rating:hover > input:checked ~ label:before { opacity: 0.4; }
-    </style>
+    <meta charset="UTF-8">
+    <title>Recenzie Eveniment</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body class="bg-light p-5">
+<body class="bg-light">
 
-<div class="card shadow col-md-6 mx-auto">
-    <div class="card-header bg-primary text-white text-center">
-        <h4>⭐ Recenzie pentru <span th:text="${targetName}"></span></h4>
-    </div>
-    <div class="card-body text-center">
-        <form th:action="@{${postUrl}}" method="post">
+<div class="container mt-5" style="max-width: 600px;">
+    <div class="card shadow border-0">
+        <div class="card-header bg-primary text-white text-center">
+            <h4 class="mb-0" th:text="${isEdit} ? '✏ Editează Recenzia' : '⭐ Lasă o Recenzie'">Titlu</h4>
+        </div>
+        <div class="card-body p-4">
 
-            <input type="hidden" name="eventId" th:value="${eventId}" />
+            <div class="text-center mb-4">
+                <h5 class="text-secondary">Recenzie pentru <span th:text="${targetName}" class="fw-bold text-dark">...</span></h5>
+            </div>
 
-            <div class="mb-3">
-                <label class="form-label fw-bold">Selectează Nota:</label>
-                <div class="rating">
-                    <input type="radio" name="rating" value="5" id="5"><label for="5">☆</label>
-                    <input type="radio" name="rating" value="4" id="4"><label for="4">☆</label>
-                    <input type="radio" name="rating" value="3" id="3"><label for="3">☆</label>
-                    <input type="radio" name="rating" value="2" id="2"><label for="2">☆</label>
-                    <input type="radio" name="rating" value="1" id="1"><label for="1">☆</label>
+            <form th:action="@{${postUrl}}" th:object="${review}" method="post">
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Nota acordată:</label>
+                    <select th:field="*{rating}" class="form-select border-primary">
+                        <option value="5">⭐⭐⭐⭐⭐ (Excelent)</option>
+                        <option value="4">⭐⭐⭐⭐ (Bun)</option>
+                        <option value="3">⭐⭐⭐ (Mediu)</option>
+                        <option value="2">⭐⭐ (Slab)</option>
+                        <option value="1">⭐ (Foarte Slab)</option>
+                    </select>
                 </div>
-            </div>
 
-            <div class="mb-3">
-                <label class="form-label">Comentariul tău:</label>
-                <textarea name="comment" class="form-control" rows="4" placeholder="Cum a fost experiența?" required></textarea>
-            </div>
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Părerea ta:</label>
+                    <textarea th:field="*{comment}" class="form-control" rows="5"
+                              placeholder="Spune-ne cum a fost experiența ta... Ce ți-a plăcut? Ce se putea mai bine?"></textarea>
+                </div>
 
-            <button type="submit" class="btn btn-success w-100">Trimite Recenzia</button>
-            <a href="/" class="btn btn-link mt-2">Anulează</a>
-        </form>
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-success btn-lg shadow-sm">
+                        <span th:text="${isEdit} ? '💾 Salvează Modificările' : '🚀 Trimite Recenzia'">Trimite</span>
+                    </button>
+                    <a href="/my-events" class="btn btn-outline-secondary">Anulează</a>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 

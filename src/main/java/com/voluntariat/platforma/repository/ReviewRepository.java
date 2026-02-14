@@ -5,6 +5,7 @@ import com.voluntariat.platforma.model.Review;
 import com.voluntariat.platforma.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
+import java.util.Optional;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
     // Găsește recenziile unui eveniment (pentru a vedea ce zic voluntarii)
@@ -12,4 +13,11 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     // Verifică dacă userul a dat deja recenzie la acest eveniment (să nu dea de 2 ori)
     boolean existsByReviewerAndEventAndType(User reviewer, Event event, String type);
+
+    Optional<Review> findByReviewerAndEvent(User reviewer, Event event);
+
+    List<Review> findByEvent(Event event);
+
+    // 3. Găsește toate recenziile scrise de un voluntar (pentru profilul lui)
+    List<Review> findByUser(User user);
 }
