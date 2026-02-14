@@ -61,23 +61,32 @@
 
     <div class="row">
         <div th:each="app : ${historyApps}" class="col-md-6">
-            <div class="card shadow-sm mb-4 border-secondary h-100 opacity-75 bg-light">
+            <div class="card shadow-sm mb-4 border-secondary h-100 bg-light">
+
                 <div class="card-header bg-secondary text-white">
                     <h5 class="mb-0 text-decoration-line-through" th:text="${app.event.title}">Titlu Vechi</h5>
                 </div>
+
                 <div class="card-body d-flex flex-column">
                     <p class="mb-1"><strong>Companie:</strong> <span th:text="${app.event.company.companyName}">Nume</span></p>
                     <p class="mb-3"><strong>S-a încheiat pe:</strong> <span th:text="${app.event.endDate}" class="text-danger">Data</span></p>
 
                     <div class="mt-auto">
-                        <div class="alert alert-light border py-2 mb-3">
+                        <div class="alert alert-light border py-2 mb-3 text-center">
                             ✅ <strong>Eveniment Finalizat</strong>
                         </div>
 
-                        <a th:href="@{/volunteer/review-event/{id}(id=${app.event.id})}"
-                           class="btn btn-outline-primary w-100">
-                            ⭐ Lasă o Recenzie
-                        </a>
+                        <div class="d-grid gap-2">
+                            <a th:href="@{/volunteer/review-event/{id}(id=${app.event.id})}"
+                               class="btn btn-primary">
+                                ⭐ Lasă / Editează Recenzia
+                            </a>
+
+                            <a th:href="@{/jobs/details/{id}(id=${app.event.id})}"
+                               class="btn btn-outline-secondary">
+                                👀 Vezi Recenziile Colegilor
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>

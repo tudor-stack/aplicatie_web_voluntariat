@@ -44,10 +44,12 @@
                     <span class="badge bg-success" th:text="${event.startDate}">Dată</span>
                     <div class="d-flex justify-content-between align-items-center mt-3">
 
-                        <span class="badge bg-success" th:text="${event.startDate}">Data</span>
+                        <a th:href="@{/jobs/details/{id}(id=${event.id})}" class="btn btn-info text-white btn-sm me-2">
+                            ℹ️ Detalii & Recenzii
+                        </a>
 
-                        <form th:action="@{/jobs/apply/{id}(id=${event.id})}" method="post">
-                            <button type="submit" class="btn btn-outline-primary">
+                        <form th:action="@{/jobs/apply/{id}(id=${event.id})}" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-outline-primary btn-sm">
                                 Aplică Acum 🚀
                             </button>
                         </form>

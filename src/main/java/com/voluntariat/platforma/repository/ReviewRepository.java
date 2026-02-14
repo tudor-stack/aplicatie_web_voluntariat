@@ -16,8 +16,9 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     Optional<Review> findByReviewerAndEvent(User reviewer, Event event);
 
+    // 2. Găsește toate recenziile unui eveniment (pentru pagina de detalii)
     List<Review> findByEvent(Event event);
 
-    // 3. Găsește toate recenziile scrise de un voluntar (pentru profilul lui)
-    List<Review> findByUser(User user);
+    // 3. Găsește toate recenziile scrise de un voluntar (dacă ai nevoie la profil)
+    List<Review> findByReviewer(User reviewer);
 }
