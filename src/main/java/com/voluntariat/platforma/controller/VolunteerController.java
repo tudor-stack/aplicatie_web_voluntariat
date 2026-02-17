@@ -20,7 +20,7 @@ import com.voluntariat.platforma.exception.ResourceNotFoundException;
 
 
 import java.time.LocalDate;
-import java.util.ArrayList; // <--- Pentru lista goala
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,11 +37,9 @@ public class VolunteerController {
     private UserRepository userRepository;
 
     @Autowired
-    private ReviewRepository reviewRepository; // <--- 1. AM ADAUGAT ASTA
+    private ReviewRepository reviewRepository;
 
-    // ---------------------------------------------------------
-    // LISTA PRINCIPALA DE JOBURI (Doar cele viitoare)
-    // ---------------------------------------------------------
+
     @GetMapping("/jobs")
     public String showAllJobs(Model model) {
         List<Event> events = eventRepository.findByStartDateGreaterThanEqual(LocalDate.now());
@@ -50,7 +48,7 @@ public class VolunteerController {
     }
 
     // ---------------------------------------------------------
-    // DETALII JOB + LOGICA DE RECENZII (NOU)
+    // DETALII JOB + LOGICA DE RECENZII
     // ---------------------------------------------------------
     @GetMapping("/jobs/details/{id}")
     public String showJobDetails(@PathVariable Long id, Model model) throws ResourceNotFoundException {
@@ -59,21 +57,21 @@ public class VolunteerController {
 
         model.addAttribute("event", event);
 
-        // 2. LOGICA DE TIMP: S-a terminat evenimentul?
-        // True dacă data de final este înainte de ziua de azi
+        // 2. LOGICA DE TIMP:
+
         boolean isFinished = event.getEndDate().isBefore(LocalDate.now());
         model.addAttribute("isFinished", isFinished);
 
-        // 3. RECENZII: Le trimitem DOAR dacă evenimentul e gata
+        // 3. RECENZII:
         if (isFinished) {
             List<Review> reviews = reviewRepository.findByEvent(event);
             model.addAttribute("reviews", reviews);
         } else {
-            // Trimitem o listă goală ca să nu dea eroare în HTML
+
             model.addAttribute("reviews", new ArrayList<>());
         }
 
-        // 4. IDENTITATE: Cine este utilizatorul curent? (Pt butonul de Edit)
+        // 4. IDENTITATE:
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated() && !auth.getPrincipal().equals("anonymousUser")) {
             User currentUser = userRepository.findByEmail(auth.getName());
@@ -82,7 +80,7 @@ public class VolunteerController {
             model.addAttribute("currentUserId", -1L);
         }
 
-        // Returnăm pagina HTML de detalii (pe care o vom crea/modifica imediat)
+        // Returnăm pagina HTML de detalii
         return "job_details";
     }
 
