@@ -176,23 +176,49 @@ public class CompanyController {
 
     // 5. Update Eveniment (SECURIZAT)
     @PostMapping("/company/update-event")
-    public String updateEvent(@ModelAttribute Event event) {
+    public String updateEvent(@ModelAttribute Event eventFromForm) {
         Company currentCompany = getCurrentCompany();
-        Event originalEvent = eventRepository.findById(event.getId()).orElse(null);
 
-        // Verificăm proprietarul înainte de update
-        if (originalEvent != null && originalEvent.getCompany().getId().equals(currentCompany.getId())) {
+        // 1. Căutăm evenimentul original în baza de date
+        Event originalEvent = eventRepository.findById(eventFromForm.getId()).orElse(null);
 
-            originalEvent.setTitle(event.getTitle());
-            originalEvent.setDescription(event.getDescription());
-            originalEvent.setStartDate(event.getStartDate());
-            originalEvent.setEndDate(event.getEndDate());
-            originalEvent.setDuration(event.getDuration());
-
-            eventRepository.save(originalEvent);
-        } else {
+        // 2. Verificăm dacă evenimentul există și aparține companiei curente (Securitate)
+        if (originalEvent == null || !originalEvent.getCompany().getId().equals(currentCompany.getId())) {
             return "redirect:/company/dashboard?error=unauthorized_update";
         }
+
+        // ===================================================================================
+        // 3. VALIDAREA INTELIGENTĂ A DATEI (Feature-ul cerut)
+        // ===================================================================================
+
+        // Verificăm: A schimbat utilizatorul data de start?
+        boolean dataStartSchimbata = !eventFromForm.getStartDate().equals(originalEvent.getStartDate());
+
+        if (dataStartSchimbata) {
+            // Dacă a schimbat data, aplicăm regula strictă de 2 zile
+            LocalDate minDate = LocalDate.now().plusDays(2);
+            if (eventFromForm.getStartDate().isBefore(minDate)) {
+                return "redirect:/company/dashboard?error=update_date_too_soon";
+            }
+        }
+
+        // 4. Validare: Data de final să nu fie înainte de start
+        if (eventFromForm.getEndDate().isBefore(eventFromForm.getStartDate())) {
+            return "redirect:/company/dashboard?error=end_date_error";
+        }
+
+        // ===================================================================================
+        // 5. Actualizarea Datelor
+        // ===================================================================================
+
+        originalEvent.setTitle(eventFromForm.getTitle());
+        originalEvent.setDescription(eventFromForm.getDescription());
+        originalEvent.setStartDate(eventFromForm.getStartDate());
+        originalEvent.setEndDate(eventFromForm.getEndDate());
+        originalEvent.setDuration(eventFromForm.getDuration());
+        originalEvent.setCategory(eventFromForm.getCategory());
+
+        eventRepository.save(originalEvent);
 
         return "redirect:/company/dashboard?updated";
     }

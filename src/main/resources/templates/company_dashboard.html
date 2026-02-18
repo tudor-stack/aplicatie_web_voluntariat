@@ -26,7 +26,10 @@
                     Adaugă Eveniment Nou
                 </div>
                 <div class="card-body">
-
+                    <div th:if="${param.error == 'update_date_too_soon'}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong>Eroare la actualizare:</strong> Nu poți reprograma evenimentul mai devreme de 2 zile de la data de azi!
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
                     <div th:if="${param.error == 'date_too_soon'}" class="alert alert-danger">
                         Eroare: Evenimentul trebuie anunțat cu minim 2 zile înainte!
                     </div>
@@ -106,6 +109,10 @@
 
                     <div th:each="event : ${upcomingEvents}" class="card shadow-sm mb-3 border-primary">
                         <div class="card-body">
+                            <span class="badge bg-secondary mb-2"
+                                  th:text="${event.category != null ? event.category.name : 'Fără Categorie'}">
+                            </span>
+
                             <h5 class="card-title text-primary" th:text="${event.title}">Titlu</h5>
                             <p class="small text-muted">Start: <span th:text="${event.startDate}"></span></p>
                             <div class="d-flex gap-2">
@@ -124,6 +131,10 @@
 
                     <div th:each="event : ${ongoingEvents}" class="card shadow-sm mb-3 border-success">
                         <div class="card-body">
+                            <span class="badge bg-secondary mb-2"
+                                  th:text="${event.category != null ? event.category.name : 'Fără Categorie'}">
+                            </span>
+
                             <h5 class="card-title text-success" th:text="${event.title}">Titlu</h5>
                             <span class="badge bg-success mb-2">Activ Acum</span>
                             <p class="small text-muted">Se termină pe: <span th:text="${event.endDate}"></span></p>
@@ -140,6 +151,10 @@
 
                     <div th:each="event : ${pastEvents}" class="card shadow-sm mb-3 bg-light">
                         <div class="card-body">
+                            <span class="badge bg-secondary mb-2"
+                                  th:text="${event.category != null ? event.category.name : 'Fără Categorie'}">
+                            </span>
+
                             <h5 class="card-title text-muted text-decoration-line-through" th:text="${event.title}">Titlu</h5>
                             <p class="small text-muted">Încheiat la: <span th:text="${event.endDate}"></span></p>
 
