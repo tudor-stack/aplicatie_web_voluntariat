@@ -79,55 +79,78 @@
         </div>
 
         <div class="col-md-8">
-            <h3 class="mb-3">Evenimentele Tale</h3>
+            <h3 class="mb-3">Gestionare Evenimente</h3>
 
-            <div th:if="${listaEvenimente.empty}" class="alert alert-info">
-                Nu ai creat încă niciun eveniment. Folosește formularul din stânga!
-            </div>
+            <ul class="nav nav-tabs mb-3" id="eventTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="upcoming-tab" data-bs-toggle="tab" data-bs-target="#upcoming" type="button" role="tab">
+                        📅 Viitoare
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="ongoing-tab" data-bs-toggle="tab" data-bs-target="#ongoing" type="button" role="tab">
+                        🔥 În Desfășurare
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="past-tab" data-bs-toggle="tab" data-bs-target="#past" type="button" role="tab">
+                        🏁 Finalizate
+                    </button>
+                </li>
+            </ul>
 
-            <div th:each="event : ${listaEvenimente}" class="card shadow-sm mb-3">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
+            <div class="tab-content" id="eventTabsContent">
 
-                        <h5 class="card-title text-primary">
-                            <span th:if="${event.category != null}" th:text="${event.category.name} + ': '" class="text-muted small"></span>
+                <div class="tab-pane fade show active" id="upcoming" role="tabpanel">
+                    <div th:if="${upcomingEvents.empty}" class="alert alert-light text-center">Nu ai evenimente planificate.</div>
 
-                            <span th:text="${event.title}">Titlu Eveniment</span>
-                        </h5>
-
-                        <span class="badge bg-secondary">
-                            <span th:text="${event.startDate}">Start</span> ->
-                            <span th:text="${event.endDate}">End</span>
-                        </span>
-                    </div>
-
-                    <p class="card-text mt-2" th:text="${event.description}">Descriere...</p>
-
-                    <div class="mt-2 d-flex gap-2">
-
-
-                        <a th:href="@{/company/event/{id}/applicants(id=${event.id})}" class="btn btn-sm btn-info text-white">
-                            👥 Aplicanți
-                        </a>
-
-                        <a th:href="@{/company/event/{id}/attendance(id=${event.id})}" class="btn btn-sm btn-success">
-                            📋 Listă Finală
-                        </a>
-
-                        <a th:href="@{/company/edit-event/{id}(id=${event.id})}" class="btn btn-sm btn-outline-warning">
-                            ✏️ Editează
-                        </a>
-                        <form th:action="@{/company/delete-event/{id}(id=${event.id})}" method="post"
-                              onsubmit="return confirm('Ești sigur că vrei să ștergi acest eveniment? Această acțiune este ireversibilă!');">
-                            <button type="submit" class="btn btn-sm btn-outline-danger">
-                                🗑️ Șterge
-                            </button>
-                        </form>
-
+                    <div th:each="event : ${upcomingEvents}" class="card shadow-sm mb-3 border-primary">
+                        <div class="card-body">
+                            <h5 class="card-title text-primary" th:text="${event.title}">Titlu</h5>
+                            <p class="small text-muted">Start: <span th:text="${event.startDate}"></span></p>
+                            <div class="d-flex gap-2">
+                                <a th:href="@{/company/edit-event/{id}(id=${event.id})}" class="btn btn-sm btn-outline-warning">✏️ Editează</a>
+                                <a th:href="@{/company/event/{id}/applicants(id=${event.id})}" class="btn btn-sm btn-info text-white">👥 Gestionează Voluntari</a>
+                                <form th:action="@{/company/delete-event/{id}(id=${event.id})}" method="post" onsubmit="return confirm('Sigur ștergi?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">🗑️ Șterge</button>
+                                </form>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
+                <div class="tab-pane fade" id="ongoing" role="tabpanel">
+                    <div th:if="${ongoingEvents.empty}" class="alert alert-light text-center">Niciun eveniment activ momentan.</div>
+
+                    <div th:each="event : ${ongoingEvents}" class="card shadow-sm mb-3 border-success">
+                        <div class="card-body">
+                            <h5 class="card-title text-success" th:text="${event.title}">Titlu</h5>
+                            <span class="badge bg-success mb-2">Activ Acum</span>
+                            <p class="small text-muted">Se termină pe: <span th:text="${event.endDate}"></span></p>
+
+                            <a th:href="@{/company/event/{id}/attendance(id=${event.id})}" class="btn btn-sm btn-success w-100">
+                                📋 Vezi Prezența
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="past" role="tabpanel">
+                    <div th:if="${pastEvents.empty}" class="alert alert-light text-center">Nu ai evenimente finalizate.</div>
+
+                    <div th:each="event : ${pastEvents}" class="card shadow-sm mb-3 bg-light">
+                        <div class="card-body">
+                            <h5 class="card-title text-muted text-decoration-line-through" th:text="${event.title}">Titlu</h5>
+                            <p class="small text-muted">Încheiat la: <span th:text="${event.endDate}"></span></p>
+
+                            <a th:href="@{/company/event/{id}/attendance(id=${event.id})}" class="btn btn-sm btn-dark w-100">
+                                ⭐ Acordă Recenzii / Vezi Istoric
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
         </div>
     </div>
 </div>
@@ -148,5 +171,7 @@
         }
     });
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 </body> </html>

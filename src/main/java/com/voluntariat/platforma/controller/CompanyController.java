@@ -90,9 +90,33 @@ public class CompanyController {
 
         model.addAttribute("companyName", company.getCompanyName());
         model.addAttribute("newEvent", new Event());
-        // Aici e sigur, pentru că oricum căutăm 'findByCompany'
-        model.addAttribute("listaEvenimente", eventRepository.findByCompany(company));
         model.addAttribute("categories", categoryRepository.findAll());
+
+        // --- LOGICA NOUĂ DE FILTRARE ---
+        List<Event> allEvents = eventRepository.findByCompany(company);
+        LocalDate today = LocalDate.now();
+
+        // 1. Viitoare (Start > Azi)
+        List<Event> upcomingEvents = allEvents.stream()
+                .filter(e -> e.getStartDate().isAfter(today))
+                .toList();
+
+        // 2. În Desfășurare (Start <= Azi ȘI End >= Azi)
+        List<Event> ongoingEvents = allEvents.stream()
+                .filter(e -> !e.getStartDate().isAfter(today) && !e.getEndDate().isBefore(today))
+                .toList();
+
+        // 3. Finalizate (End < Azi)
+        List<Event> pastEvents = allEvents.stream()
+                .filter(e -> e.getEndDate().isBefore(today))
+                .toList();
+
+        model.addAttribute("upcomingEvents", upcomingEvents);
+        model.addAttribute("ongoingEvents", ongoingEvents);
+        model.addAttribute("pastEvents", pastEvents);
+
+        // Păstrăm și lista completă doar dacă ai nevoie de ea pentru statistici, altfel o putem șterge.
+        // model.addAttribute("listaEvenimente", allEvents);
 
         return "company_dashboard";
     }
