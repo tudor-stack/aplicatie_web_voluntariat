@@ -38,7 +38,7 @@ public class AuthController {
             User user = userRepository.findByEmail(email);
 
             if (user != null) {
-                // MODIFICARE AICI: Schimbăm din "ORGANIZATOR" în "Company"
+                // MODIFICARE AICI: Schimbăm din "Company" în "Company"
                 if ("Company".equals(user.getRole())) {
                     return "redirect:/company/dashboard";
                 }
