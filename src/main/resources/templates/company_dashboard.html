@@ -38,7 +38,7 @@
 
                         <div class="mb-3">
                             <label class="form-label">Titlu Eveniment</label>
-                            <input type="text" class="form-control" th:field="*{title}" required>
+                            <input type="text" id="title" class="form-control" th:field="*{title}" required>
                         </div>
 
                         <div class="mb-3">
@@ -54,17 +54,17 @@
 
                         <div class="mb-3">
                             <label class="form-label">Durată Estimată</label>
-                            <input type="text" class="form-control" th:field="*{duration}" placeholder="Ex: 4 ore, 2 zile..." required>
+                            <input type="text" id="duration" class="form-control" th:field="*{duration}" placeholder="Ex: 4 ore, 2 zile..." required>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Descriere</label>
-                            <textarea class="form-control" th:field="*{description}" rows="3"></textarea>
+                            <textarea id="description" class="form-control" th:field="*{description}" rows="3"></textarea>
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Categorie</label>
-                            <select class="form-select" th:field="*{category}" required>
+                            <select id="category" class="form-select" th:field="*{category}" required>
                                 <option value="" disabled selected>-- Alege o categorie --</option>
                                 <option th:each="cat : ${categories}"
                                         th:value="${cat.id}"
@@ -133,5 +133,20 @@
 </div>
 
 <script th:src="@{/js/event-validation.js}"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const urlParams = new URLSearchParams(window.location.search);
+
+        // Dacă URL-ul conține "?success", ștergem ciorna
+        if (urlParams.has('success')) {
+            localStorage.removeItem("event_form_draft");
+            console.log("Ciorna a fost ștearsă automat.");
+
+            // Opțional: Curățăm URL-ul vizual
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    });
+</script>
 
 </body> </html>

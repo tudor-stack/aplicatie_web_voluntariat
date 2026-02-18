@@ -1,0 +1,180 @@
+Folder PATH listing
+Volume serial number is E616-4C66
+C:.
+|   .gitattributes
+|   .gitignore
+|   HELP.md
+|   mvnw
+|   mvnw.cmd
+|   platforma.iml
+|   platforma.rar
+|   pom.xml
+|   structura.txt
+|   
++---.idea
+|   |   .gitignore
+|   |   compiler.xml
+|   |   encodings.xml
+|   |   jarRepositories.xml
+|   |   misc.xml
+|   |   modules.xml
+|   |   vcs.xml
+|   |   workspace.xml
+|   |   
+|   \---libraries
+|           Permanent_Script_Dependencies.xml
+|           
++---.mvn
+|   \---wrapper
+|           maven-wrapper.properties
+|           
++---src
+|   +---main
+|   |   +---java
+|   |   |   \---com
+|   |   |       \---voluntariat
+|   |   |           \---platforma
+|   |   |               |   PlatformaApplication.java
+|   |   |               |   TestDB.java
+|   |   |               |   
+|   |   |               +---config
+|   |   |               |       DataInit.java
+|   |   |               |       SecurityConfig.java
+|   |   |               |       
+|   |   |               +---controller
+|   |   |               |       AuthController.java
+|   |   |               |       CompanyController.java
+|   |   |               |       ReviewController.java
+|   |   |               |       VolunteerController.java
+|   |   |               |       VolunteerPageController.java
+|   |   |               |       VolunteerProfileController.java
+|   |   |               |       
+|   |   |               +---model
+|   |   |               |       Category.java
+|   |   |               |       Company.java
+|   |   |               |       Event.java
+|   |   |               |       Review.java
+|   |   |               |       User.java
+|   |   |               |       VolunteerApplication.java
+|   |   |               |       VolunteerProfile.java
+|   |   |               |       
+|   |   |               +---repository
+|   |   |               |       CategoryRepository.java
+|   |   |               |       CompanyRepository.java
+|   |   |               |       EventRepository.java
+|   |   |               |       ReviewRepository.java
+|   |   |               |       UserRepository.java
+|   |   |               |       VolunteerApplicationRepository.java
+|   |   |               |       VolunteerProfileRepository.java
+|   |   |               |       
+|   |   |               \---service
+|   |   \---resources
+|   |       |   application.properties
+|   |       |   
+|   |       +---static
+|   |       |   \---js
+|   |       |           event-validation.js
+|   |       |           
+|   |       \---templates
+|   |               applicants_list.html
+|   |               attendance_list.html
+|   |               company_dashboard.html
+|   |               edit_event.html
+|   |               homepage.html
+|   |               jobs_list.html
+|   |               login.html
+|   |               my_events.html
+|   |               register.html
+|   |               review_form.html
+|   |               volunteer_profile.html
+|   |               
+|   \---test
+|       \---java
+|           \---com
+|               \---voluntariat
+|                   \---platforma
+|                           PlatformaApplicationTests.java
+|                           
+\---target
+    +---classes
+    |   |   application.properties
+    |   |   
+    |   +---com
+    |   |   \---voluntariat
+    |   |       \---platforma
+    |   |           |   PlatformaApplication.class
+    |   |           |   TestDB.class
+    |   |           |   
+    |   |           +---config
+    |   |           |       DataInit.class
+    |   |           |       SecurityConfig.class
+    |   |           |       
+    |   |           +---controller
+    |   |           |       AuthController.class
+    |   |           |       CompanyController.class
+    |   |           |       ReviewController.class
+    |   |           |       VolunteerController.class
+    |   |           |       VolunteerPageController.class
+    |   |           |       VolunteerProfileController.class
+    |   |           |       
+    |   |           +---model
+    |   |           |       Category.class
+    |   |           |       Company.class
+    |   |           |       Event.class
+    |   |           |       Review.class
+    |   |           |       User.class
+    |   |           |       VolunteerApplication.class
+    |   |           |       VolunteerProfile.class
+    |   |           |       
+    |   |           \---repository
+    |   |                   CategoryRepository.class
+    |   |                   CompanyRepository.class
+    |   |                   EventRepository.class
+    |   |                   ReviewRepository.class
+    |   |                   UserRepository.class
+    |   |                   VolunteerApplicationRepository.class
+    |   |                   VolunteerProfileRepository.class
+    |   |                   
+    |   +---static
+    |   |   \---js
+    |   |           event-validation.js
+    |   |           
+    |   \---templates
+    |           applicants_list.html
+    |           attendance_list.html
+    |           company_dashboard.html
+    |           edit_event.html
+    |           homepage.html
+    |           jobs_list.html
+    |           login.html
+    |           my_events.html
+    |           register.html
+    |           review_form.html
+    |           volunteer_profile.html
+    |           
+    +---generated-sources
+    |   \---annotations
+    +---generated-test-sources
+    |   \---test-annotations
+    +---maven-status
+    |   \---maven-compiler-plugin
+    |       +---compile
+    |       |   \---default-compile
+    |       |           createdFiles.lst
+    |       |           inputFiles.lst
+    |       |           
+    |       \---testCompile
+    |           \---default-testCompile
+    |                   createdFiles.lst
+    |                   inputFiles.lst
+    |                   
+    +---surefire-reports
+    |       com.voluntariat.platforma.PlatformaApplicationTests.txt
+    |       TEST-com.voluntariat.platforma.PlatformaApplicationTests.xml
+    |       
+    \---test-classes
+        \---com
+            \---voluntariat
+                \---platforma
+                        PlatformaApplicationTests.class
+                        
