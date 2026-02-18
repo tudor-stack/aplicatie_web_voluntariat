@@ -30,23 +30,39 @@ public class VolunteerPageController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = userRepository.findByEmail(auth.getName());
 
-        List<VolunteerApplication> allApps=applicationRepository.findByVolunteerAndStatus(user,"ACCEPTED");
+        List<VolunteerApplication> allApps=applicationRepository.findByVolunteer(user);
         LocalDate today=LocalDate.now();
 
         List<VolunteerApplication> upcoming=new ArrayList<>();
+        List<VolunteerApplication> ongoing=new ArrayList<>();
         List<VolunteerApplication> history=new ArrayList<>();
 
         for(VolunteerApplication app:allApps){
-            if(app.getEvent().getStartDate().isBefore(today)){
-                history.add(app);
-            }else{
+            if("REJECTED".equals(app.getStatus())){
+                continue;
+            }
+            LocalDate start = app.getEvent().getStartDate();
+            LocalDate end = app.getEvent().getEndDate();
+
+            if(start.isAfter(end)){
                 upcoming.add(app);
+            }
+            else if(end.isBefore(today)){
+                if("ACCEPTED".equals(app.getStatus())|| "COMPLETED".equals(app.getStatus())){
+                    history.add(app);
+                }
+            }
+            else{
+                if("ACCEPTED".equals(app.getStatus())|| "COMPLETED".equals(app.getStatus())){
+                    ongoing.add(app);
+                }
             }
         }
 
         model.addAttribute("upcomingApps",upcoming);
+        model.addAttribute("ongoingApps",ongoing);
         model.addAttribute("historyApps",history);
-
+        model.addAttribute("userName",user.getFirstName());
         return "my_events";
     }
 }
