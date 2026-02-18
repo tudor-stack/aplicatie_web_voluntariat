@@ -28,16 +28,25 @@
     </div>
 
     <ul class="nav nav-tabs mb-4" id="eventTabs" role="tablist">
+
         <li class="nav-item" role="presentation">
-            <button class="nav-link active fw-bold" id="upcoming-tab" data-bs-toggle="tab" data-bs-target="#upcoming" type="button" role="tab">
-                📅 Urmează <span class="badge bg-primary rounded-pill ms-1" th:text="${upcomingApps.size()}">0</span>
+            <button class="nav-link active fw-bold text-warning" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab">
+                ⏳ În Așteptare <span class="badge bg-warning text-dark rounded-pill ms-1" th:text="${pendingApps.size()}">0</span>
             </button>
         </li>
+
+        <li class="nav-item" role="presentation">
+            <button class="nav-link fw-bold" id="upcoming-tab" data-bs-toggle="tab" data-bs-target="#upcoming" type="button" role="tab">
+                📅 Confirmate <span class="badge bg-primary rounded-pill ms-1" th:text="${upcomingApps.size()}">0</span>
+            </button>
+        </li>
+
         <li class="nav-item" role="presentation">
             <button class="nav-link fw-bold text-success" id="ongoing-tab" data-bs-toggle="tab" data-bs-target="#ongoing" type="button" role="tab">
                 🔥 În Desfășurare <span class="badge bg-success rounded-pill ms-1" th:text="${ongoingApps.size()}">0</span>
             </button>
         </li>
+
         <li class="nav-item" role="presentation">
             <button class="nav-link fw-bold text-secondary" id="history-tab" data-bs-toggle="tab" data-bs-target="#history" type="button" role="tab">
                 🏁 Istoric <span class="badge bg-secondary rounded-pill ms-1" th:text="${historyApps.size()}">0</span>
@@ -47,10 +56,46 @@
 
     <div class="tab-content" id="eventTabsContent">
 
-        <div class="tab-pane fade show active" id="upcoming" role="tabpanel">
+        <div class="tab-pane fade show active" id="pending" role="tabpanel">
+
+            <div th:if="${pendingApps.empty}" class="alert alert-light text-center py-4 border border-warning">
+                Nu ai aplicații în așteptare.
+            </div>
+
+            <div class="row">
+                <div th:each="app : ${pendingApps}" class="col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm border-warning">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="card-title text-dark mb-0" th:text="${app.event.title}">Titlu</h5>
+                                <span class="badge bg-warning text-dark">Așteaptă Răspuns ⏳</span>
+                            </div>
+
+                            <p class="mb-1 text-muted small">
+                                <strong>📅 Start:</strong> <span th:text="${app.event.startDate}">Data</span>
+                            </p>
+                            <p class="mb-2 text-muted small">
+                                <strong>🏢 Companie:</strong> <span th:text="${app.event.company.companyName}">Companie</span>
+                            </p>
+
+                            <hr>
+                            <p class="small text-muted">
+                                Ai aplicat la acest eveniment. Te vom notifica imediat ce organizatorul îți acceptă cererea.
+                            </p>
+
+                            <a th:href="@{/jobs/details/{id}(id=${app.event.id})}" class="btn btn-sm btn-outline-warning text-dark w-100 mt-2">
+                                Vezi Anunțul
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="upcoming" role="tabpanel">
 
             <div th:if="${upcomingApps.empty}" class="alert alert-light border border-primary text-center py-4">
-                <h4>Nu ai planuri momentan.</h4>
+                <h4>Nu ai evenimente confirmate.</h4>
                 <p class="text-muted">Explorează platforma și înscrie-te la noi oportunități!</p>
                 <a href="/jobs" class="btn btn-primary">Găsește Evenimente</a>
             </div>
@@ -61,9 +106,7 @@
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-start mb-2">
                                 <h5 class="card-title text-primary mb-0" th:text="${app.event.title}">Titlu</h5>
-
-                                <span th:if="${app.status == 'ACCEPTED'}" class="badge bg-success">Confirmat ✅</span>
-                                <span th:if="${app.status == 'PENDING'}" class="badge bg-warning text-dark">În Așteptare ⏳</span>
+                                <span class="badge bg-success">Confirmat ✅</span>
                             </div>
 
                             <p class="mb-1 text-muted small">
@@ -148,7 +191,8 @@
             </div>
         </div>
 
-    </div> </div>
+    </div>
+</div>
 
 <footer class="text-center py-4 text-muted mt-5 border-top">
     <small>Platforma Voluntariat &copy; 2026</small>

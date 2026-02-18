@@ -36,29 +36,35 @@ public class VolunteerPageController {
         List<VolunteerApplication> upcoming=new ArrayList<>();
         List<VolunteerApplication> ongoing=new ArrayList<>();
         List<VolunteerApplication> history=new ArrayList<>();
+        List<VolunteerApplication> pending=new ArrayList<>();
 
         for(VolunteerApplication app:allApps){
-            if("REJECTED".equals(app.getStatus())){
-                continue;
-            }
+            String status=app.getStatus();
             LocalDate start = app.getEvent().getStartDate();
             LocalDate end = app.getEvent().getEndDate();
 
-            if(start.isAfter(end)){
+
+            if ("PENDING".equals(status) && start.isAfter(today.minusDays(1))) {
+                pending.add(app);
+            }
+
+            // B. VIITOARE (Doar cele ACCEPTATE)
+            else if ("ACCEPTED".equals(status) && start.isAfter(today)) {
                 upcoming.add(app);
             }
-            else if(end.isBefore(today)){
-                if("ACCEPTED".equals(app.getStatus())|| "COMPLETED".equals(app.getStatus())){
-                    history.add(app);
-                }
+
+            // C. ÎN DESFĂȘURARE (ACCEPTED + Perioada activă)
+            else if ("ACCEPTED".equals(status) && !start.isAfter(today) && !end.isBefore(today)) {
+                ongoing.add(app);
             }
-            else{
-                if("ACCEPTED".equals(app.getStatus())|| "COMPLETED".equals(app.getStatus())){
-                    ongoing.add(app);
-                }
+
+            // D. ISTORIC (Data final a trecut)
+            else if (end.isBefore(today)) {
+                // Aici intră și cele ACCEPTED, COMPLETED, sau chiar PENDING vechi
+                history.add(app);
             }
         }
-
+        model.addAttribute("pendingApps",pending);
         model.addAttribute("upcomingApps",upcoming);
         model.addAttribute("ongoingApps",ongoing);
         model.addAttribute("historyApps",history);
