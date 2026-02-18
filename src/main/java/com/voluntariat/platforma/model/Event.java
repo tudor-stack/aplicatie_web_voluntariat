@@ -8,6 +8,7 @@ import jakarta.persistence.OneToMany;
 import java.util.List;
 import java.util.ArrayList;
 import com.voluntariat.platforma.model.VolunteerApplication;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Entity
 @Table(name="Events")
@@ -21,7 +22,9 @@ public class Event {
     @Column(length = 1000)
     private String description;
     private String duration;
+    @DateTimeFormat(pattern="yyyy-MM-dd")
     private LocalDate startDate;
+    @DateTimeFormat(pattern="yyyy-MM-dd")
     private LocalDate endDate;
 
     // Importă: import jakarta.persistence.FetchType;
