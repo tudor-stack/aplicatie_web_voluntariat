@@ -22,40 +22,59 @@
                     <div th:if="${error}" class="alert alert-danger text-center" th:text="${error}">
                     </div>
 
-                    <form th:action="@{/register}" th:object="${userDto}" method="post">
-
+                    <form th:action="@{/register}" th:object="${userDto}" method="post" class="needs-validation" novalidate>
                         <div class="mb-3">
-                            <label class="form-label">Prenume</label>
+                            <label class="form-label">Prenume <span class="text-danger">*</span></label>
+
                             <input type="text" class="form-control" th:field="*{firstName}"
                                    th:classappend="${#fields.hasErrors('firstName')} ? 'is-invalid' : ''"
-                                   placeholder="Ex: Ion">
+                                   placeholder="Ex: Ion" required minlength="2">
+
                             <div class="invalid-feedback" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></div>
+
+                            <div class="invalid-feedback">Prenumele este obligatoriu (min 2 caractere).</div>
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Nume</label>
+                            <label class="form-label">Nume <span class="text-danger">*</span></label>
+
                             <input type="text" class="form-control" th:field="*{lastName}"
                                    th:classappend="${#fields.hasErrors('lastName')} ? 'is-invalid' : ''"
-                                   placeholder="Ex: Popescu">
+                                   placeholder="Ex: Ion" required minlength="2">
+
                             <div class="invalid-feedback" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></div>
+
+                            <div class="invalid-feedback">Numele este obligatoriu (min 2 caractere).</div>
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Email</label>
+                            <label class="form-label">Email <span class="text-danger">*</span></label>
+
                             <input type="email" class="form-control" th:field="*{email}"
                                    th:classappend="${#fields.hasErrors('email')} ? 'is-invalid' : ''"
-                                   placeholder="email@exemplu.com">
+                                   placeholder="Ex: Ion" required minlength="2">
+
                             <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+
+                            <div class="invalid-feedback">Email invalid.</div>
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Parola</label>
-                            <input type="password" class="form-control" th:field="*{password}"
-                                   th:classappend="${#fields.hasErrors('password')} ? 'is-invalid' : ''">
-                            <div class="invalid-feedback" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
-                            <small class="text-muted">Minim 8 caractere, litere și cifre.</small>
-                        </div>
+                            <label class="form-label">Parola <span class="text-danger">*</span></label>
 
+                            <input type="password" class="form-control" th:field="*{password}"
+                                   th:classappend="${#fields.hasErrors('password')} ? 'is-invalid' : ''"
+                                   placeholder="Minim 8 caractere, litere și cifre"
+                                   required
+                                   minlength="8"
+                                   pattern="^(?=.*[A-Za-z])(?=.*\d).+$">
+
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+
+                            <div class="invalid-feedback">
+                                Parola trebuie să aibă minim 8 caractere și să conțină litere și cifre.
+                            </div>
+                        </div>
                         <div class="mb-3">
                             <label class="form-label fw-bold">Selectează Tipul de Cont</label>
                             <select class="form-select border-primary" th:field="*{role}" id="roleSelect" onchange="toggleCompanyFields()">
@@ -101,7 +120,7 @@
         // Nu mai modificăm 'required' aici, ne bazăm pe validarea din Java (Backend)
         // pentru securitate, dar păstrăm logica vizuală.
 
-        if (role === "ORGANIZATOR") {
+        if (role === "Company") {
             fields.style.display = "block";
         } else {
             fields.style.display = "none";
@@ -109,11 +128,80 @@
     }
 
     // Apelează funcția la încărcarea paginii
-    // Astfel, dacă pagina se reîncarcă cu erori și "ORGANIZATOR" e selectat,
+    // Astfel, dacă pagina se reîncarcă cu erori și "Company" e selectat,
     // câmpurile rămân vizibile!
     document.addEventListener("DOMContentLoaded", function() {
         toggleCompanyFields();
     });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const forms = document.querySelectorAll('.needs-validation');
+
+        Array.from(forms).forEach(form => {
+            const inputs = form.querySelectorAll('input, select');
+
+            inputs.forEach(input => {
+
+                input.addEventListener('blur', () => {
+                    validateInput(input);
+                });
+
+                input.addEventListener('input', () => {
+                    if (input.classList.contains('is-invalid')) {
+                        validateInput(input);
+                    }
+                });
+            });
+
+
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+
+
+        toggleCompanyFields();
+        document.getElementById("roleSelect").addEventListener("change", toggleCompanyFields);
+    });
+
+
+    function validateInput(input) {
+        if (!input.checkValidity()) {
+            input.classList.add('is-invalid');
+        } else {
+            input.classList.remove('is-invalid');
+            input.classList.add('is-valid'); // Opțional: pune verde
+        }
+    }
+
+
+    function toggleCompanyFields() {
+        var roleSelect = document.getElementById("roleSelect");
+        var fields = document.getElementById("companyFields");
+        var inputName = document.getElementById("inputCompanyName");
+        var inputCui = document.getElementById("inputCui");
+
+
+        if (roleSelect.value === "Company") {
+            fields.style.display = "block";
+
+            inputName.setAttribute("required", "");
+            inputCui.setAttribute("required", "");
+        } else {
+            fields.style.display = "none";
+
+            inputName.removeAttribute("required");
+            inputCui.removeAttribute("required");
+
+            inputName.classList.remove("is-invalid");
+        }
+    }
 </script>
 
 </body>

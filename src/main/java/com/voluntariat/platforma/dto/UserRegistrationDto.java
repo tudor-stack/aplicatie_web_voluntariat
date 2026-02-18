@@ -8,9 +8,12 @@ import jakarta.validation.constraints.Size;
 public class UserRegistrationDto {
 
     @NotBlank(message = "Prenumele este obligatoriu")
+    @Size(min=2,max=50,message="Prenumele trebuie sa aiba intre 2 si 50 de caractere")
     private String firstName;
 
     @NotBlank(message = "Numele de familie este obligatoriu")
+    @Size(min=2,max=50,message="Numele trebuie sa aiba intre 2 si 50 de caractere")
+
     private String lastName;
 
     @NotBlank(message = "Email-ul este obligatoriu")

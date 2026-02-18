@@ -57,38 +57,47 @@ public class AuthController {
         return "login";
     }
 
-    // MODIFICARE 1: Folosim DTO în loc de User
+
     @GetMapping("/register")
     public String showRegisterPage(Model model) {
         model.addAttribute("userDto", new UserRegistrationDto());
         return "register";
     }
 
-    // MODIFICARE 2: Logica de validare și salvare
+
     @PostMapping("/register")
     public String registerUser(@Valid @ModelAttribute("userDto") UserRegistrationDto userDto,
                                BindingResult result, Model model) {
 
-        // ... validările de email/parolă rămân la fel ...
+        User existingUser=userRepository.findByEmail(userDto.getEmail());
+        if(existingUser!=null){
+            result.rejectValue("email", "error.user", "email-ul nu este obligatoriu");
+        }
 
-        // Schimbăm verificarea pentru 'Company'
+
         if ("Company".equals(userDto.getRole())) {
             if (userDto.getCompanyName() == null || userDto.getCompanyName().trim().isEmpty()) {
                 result.rejectValue("companyName", "error.user", "Numele organizației este obligatoriu.");
                 return "register";
             }
+            if(userDto.getCui() == null || userDto.getCui().trim().isEmpty()) {
+                result.rejectValue("cui", "error.user", "Cui este obligatorii.");
+            }
+        }
+
+        if(result.hasErrors()){
+            return "register";
         }
 
         User user = new User();
         user.setFirstName(userDto.getFirstName());
         user.setLastName(userDto.getLastName());
         user.setEmail(userDto.getEmail());
-        user.setRole(userDto.getRole()); // Aici se va salva "Volunteer" sau "Company"
+        user.setRole(userDto.getRole());
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
 
         userRepository.save(user);
 
-        // Verificăm din nou pentru a crea intrarea în tabela 'companies'
         if ("Company".equals(user.getRole())) {
             Company company = new Company(userDto.getCompanyName(), userDto.getCui(), user);
             companyRepository.save(company);
