@@ -33,12 +33,36 @@
                 </div>
             </div>
 
-            <div class="mt-4 text-end" th:unless="${isFinished}">
-                <form th:action="@{/jobs/apply/{id}(id=${event.id})}" method="post">
-                    <button type="submit" class="btn btn-lg btn-success">
-                        Vreau să particip! 🚀
-                    </button>
-                </form>
+            <div class="mt-4">
+
+                <div th:if="${applicationStatus == null and !isFinished}">
+                    <form th:action="@{/jobs/apply/{id}(id=${event.id})}" method="post">
+                        <button type="submit" class="btn btn-success btn-lg w-100 shadow">
+                            🚀 Aplică acum la acest eveniment!
+                        </button>
+                    </form>
+                </div>
+
+                <div th:if="${applicationStatus == 'PENDING'}" class="alert alert-warning text-center border-warning shadow-sm">
+                    <h4>⏳ Cerere Trimisă</h4>
+                    <p class="mb-0">Ai aplicat deja la acest eveniment. Așteaptă confirmarea organizatorului.</p>
+                    <a href="/my-events" class="btn btn-outline-warning mt-2">Vezi Status în Dashboard</a>
+                </div>
+
+                <div th:if="${applicationStatus == 'ACCEPTED'}" class="alert alert-success text-center border-success shadow-sm">
+                    <h4>✅ Ești Participat Confirmat!</h4>
+                    <p class="mb-0">Te-ai înscris cu succes. Te așteptăm la eveniment!</p>
+                    <a href="/my-events" class="btn btn-outline-success mt-2">Vezi Detalii în Dashboard</a>
+                </div>
+
+                <div th:if="${applicationStatus == 'REJECTED'}" class="alert alert-danger text-center">
+                    <p class="mb-0">Din păcate, aplicația ta pentru acest eveniment nu a fost acceptată.</p>
+                </div>
+
+                <div th:if="${isFinished}" class="alert alert-secondary text-center">
+                    🛑 Acest eveniment s-a încheiat. Nu se mai pot face înscrieri.
+                </div>
+
             </div>
         </div>
     </div>

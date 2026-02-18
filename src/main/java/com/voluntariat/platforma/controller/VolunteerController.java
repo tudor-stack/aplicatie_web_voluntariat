@@ -79,14 +79,17 @@ public class VolunteerController {
     // ---------------------------------------------------------
     @GetMapping("/jobs/details/{id}")
     public String showJobDetails(@PathVariable Long id, Model model) throws ResourceNotFoundException {
+        // 1. Găsim evenimentul
         Event event = eventRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Evenimentul cu ID-ul " + id + " nu a fost găsit!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Evenimentul nu există!"));
 
         model.addAttribute("event", event);
 
+        // 2. Logică terminare eveniment
         boolean isFinished = event.getEndDate().isBefore(LocalDate.now());
         model.addAttribute("isFinished", isFinished);
 
+        // 3. Recenzii (doar dacă s-a terminat)
         if (isFinished) {
             List<Review> reviews = reviewRepository.findByEvent(event);
             model.addAttribute("reviews", reviews);
@@ -94,13 +97,26 @@ public class VolunteerController {
             model.addAttribute("reviews", new ArrayList<>());
         }
 
+        // 4. VERIFICARE STATUS APLICARE (Cod Nou)
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null && auth.isAuthenticated() && !auth.getPrincipal().equals("anonymousUser")) {
+        String applicationStatus = null; // Default: nu a aplicat
+
+        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
             User currentUser = userRepository.findByEmail(auth.getName());
             model.addAttribute("currentUserId", currentUser.getId());
+
+            // Căutăm dacă există o aplicație între acest user și acest eveniment
+            Optional<VolunteerApplication> existingApp = volunteerApplicationRepository.findByVolunteerAndEvent(currentUser, event);
+
+            if (existingApp.isPresent()) {
+                applicationStatus = existingApp.get().getStatus(); // Va fi "PENDING", "ACCEPTED" sau "REJECTED"
+            }
         } else {
             model.addAttribute("currentUserId", -1L);
         }
+
+        // Trimitem statusul în HTML. Dacă e null, înseamnă că nu a aplicat.
+        model.addAttribute("applicationStatus", applicationStatus);
 
         return "job_details";
     }
