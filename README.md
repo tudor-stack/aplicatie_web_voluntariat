@@ -17,7 +17,7 @@ The Volunteering Management Platform provides a comprehensive solution for organ
 
 ### Technical Highlights
 - RESTful API design
-- Responsive user interface
+- Server-side rendered interface using HTML templates
 - Secure authentication and authorization
 - Data persistence with PostgreSQL
 - ORM-based database interactions
@@ -26,16 +26,16 @@ The Volunteering Management Platform provides a comprehensive solution for organ
 
 ### Backend
 - **Framework**: Spring Boot
-- **Language**: Java
+- **Language**: Java (62.1% of codebase)
 - **Dependencies**:
   - Spring Boot Web
   - Spring Data JPA
   - Hibernate (ORM)
-- **Build Tool**: Maven
+- **Build Tool**: Maven (with Maven Wrapper included)
 
 ### Frontend
-- **Languages**: JavaScript, HTML5, CSS3
-- **Architecture**: Dynamic single-page application design
+- **Languages**: HTML5 (36.4%), JavaScript (1.5%), CSS3
+- **Architecture**: Server-side rendered templates with dynamic JavaScript enhancements
 
 ### Database
 - **RDBMS**: PostgreSQL
@@ -49,7 +49,7 @@ The Volunteering Management Platform provides a comprehensive solution for organ
 Before running this application, ensure you have the following installed:
 
 - Java Development Kit (JDK) 11 or higher
-- Maven 3.6 or higher
+- Maven 3.6 or higher (or use the included Maven Wrapper — no installation required)
 - PostgreSQL 12 or higher
 - Git
 
@@ -101,13 +101,23 @@ mvn clean install
 
 ### 5. Run the Application
 
-Start the Spring Boot application:
+Start the Spring Boot application using Maven:
 
 ```bash
 mvn spring-boot:run
 ```
 
-Alternatively, you can run the compiled JAR file:
+Alternatively, use the included Maven Wrapper (no Maven installation required):
+
+```bash
+# Linux / macOS
+./mvnw spring-boot:run
+
+# Windows
+mvnw.cmd spring-boot:run
+```
+
+Or run the compiled JAR file directly:
 
 ```bash
 java -jar target/aplicatie_web_voluntariat-0.0.1-SNAPSHOT.jar
@@ -125,6 +135,8 @@ http://localhost:8080
 
 ```
 aplicatie_web_voluntariat/
+├── .mvn/
+│   └── wrapper/
 ├── src/
 │   ├── main/
 │   │   ├── java/
@@ -138,6 +150,10 @@ aplicatie_web_voluntariat/
 │   │       ├── templates/
 │   │       └── application.properties
 │   └── test/
+├── .gitattributes
+├── .gitignore
+├── mvnw
+├── mvnw.cmd
 ├── pom.xml
 └── README.md
 ```
@@ -181,6 +197,12 @@ Run the test suite with:
 mvn test
 ```
 
+Or with the Maven Wrapper:
+
+```bash
+./mvnw test
+```
+
 ## Build for Production
 
 To create a production-ready build:
@@ -207,6 +229,7 @@ The compiled JAR file will be available in the `target/` directory.
 **Maven Build Fails**
 - Verify Java and Maven versions meet requirements
 - Clear Maven cache: `mvn dependency:purge-local-repository`
+- Alternatively, use the Maven Wrapper (`./mvnw`) which uses a pinned Maven version
 
 ## Contributing
 
