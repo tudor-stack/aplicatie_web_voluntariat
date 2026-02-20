@@ -40,30 +40,22 @@ public class VolunteerController {
     private ReviewRepository reviewRepository;
 
     // ---------------------------------------------------------
-    // LISTA DE JOBURI (FEED PRINCIPAL)
+    // Lista de oportunitati
     // ---------------------------------------------------------
     @GetMapping("/jobs")
     public String showAllJobs(Model model) {
-        // 1. Luăm toate evenimentele viitoare disponibile
-        List<Event> allEvents = eventRepository.findByStartDateGreaterThanEqual(LocalDate.now());
 
-        // 2. Identificăm utilizatorul curent
+        List<Event> allEvents = eventRepository.findByStartDateGreaterThanEqual(LocalDate.now());
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-        // Verificăm dacă userul este logat și nu este "anonymousUser"
         if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getPrincipal())) {
-
             User currentUser = userRepository.findByEmail(auth.getName());
-
             if (currentUser != null) {
-                // 3. Aflăm ID-urile evenimentelor unde userul A APLICAT DEJA
-                // (Indiferent dacă e PENDING, ACCEPTED sau REJECTED - nu vrem să le mai vadă în feed)
                 List<Long> appliedEventIds = volunteerApplicationRepository.findByVolunteer(currentUser)
                         .stream()
-                        .map(app -> app.getEvent().getId()) // Luăm doar ID-ul evenimentului
+                        .map(app -> app.getEvent().getId())
                         .collect(Collectors.toList());
 
-                // 4. FILTRARE: Păstrăm doar evenimentele unde ID-ul NU este în lista celor aplicate
                 allEvents = allEvents.stream()
                         .filter(event -> !appliedEventIds.contains(event.getId()))
                         .collect(Collectors.toList());
@@ -75,21 +67,20 @@ public class VolunteerController {
     }
 
     // ---------------------------------------------------------
-    // DETALII JOB + LOGICA DE RECENZII
+    // Detalii oportunitati
     // ---------------------------------------------------------
     @GetMapping("/jobs/details/{id}")
     public String showJobDetails(@PathVariable Long id, Model model) throws ResourceNotFoundException {
-        // 1. Găsim evenimentul
+
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Evenimentul nu există!"));
 
         model.addAttribute("event", event);
 
-        // 2. Logică terminare eveniment
         boolean isFinished = event.getEndDate().isBefore(LocalDate.now());
         model.addAttribute("isFinished", isFinished);
 
-        // 3. Recenzii (doar dacă s-a terminat)
+        //Recenzii pt evenimentele incheiate
         if (isFinished) {
             List<Review> reviews = reviewRepository.findByEvent(event);
             model.addAttribute("reviews", reviews);
@@ -97,7 +88,7 @@ public class VolunteerController {
             model.addAttribute("reviews", new ArrayList<>());
         }
 
-        // 4. VERIFICARE STATUS APLICARE (Cod Nou)
+
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String applicationStatus = null; // Default: nu a aplicat
 
@@ -105,17 +96,15 @@ public class VolunteerController {
             User currentUser = userRepository.findByEmail(auth.getName());
             model.addAttribute("currentUserId", currentUser.getId());
 
-            // Căutăm dacă există o aplicație între acest user și acest eveniment
-            Optional<VolunteerApplication> existingApp = volunteerApplicationRepository.findByVolunteerAndEvent(currentUser, event);
+           Optional<VolunteerApplication> existingApp = volunteerApplicationRepository.findByVolunteerAndEvent(currentUser, event);
 
             if (existingApp.isPresent()) {
-                applicationStatus = existingApp.get().getStatus(); // Va fi "PENDING", "ACCEPTED" sau "REJECTED"
+                applicationStatus = existingApp.get().getStatus();
             }
         } else {
             model.addAttribute("currentUserId", -1L);
         }
 
-        // Trimitem statusul în HTML. Dacă e null, înseamnă că nu a aplicat.
         model.addAttribute("applicationStatus", applicationStatus);
 
         return "job_details";
@@ -137,7 +126,7 @@ public class VolunteerController {
 
             Optional<VolunteerApplication> existingApp = volunteerApplicationRepository.findByVolunteerAndEvent(volunteer, event);
 
-            // Dacă a aplicat deja, îl trimitem înapoi cu eroare (deși butonul ar trebui să nu mai apară în feed)
+
             if (existingApp.isPresent()) {
                 return "redirect:/jobs?error=already_applied";
             }

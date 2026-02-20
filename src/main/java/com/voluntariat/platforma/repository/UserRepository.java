@@ -6,10 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    // Aceasta interfata magica ne ofera automat metode ca:
-    // .save(user) -> salveaza
-    // .findAll() -> gaseste toti utilizatorii
-    // Nu trebuie sa scriem noi cod SQL!
 
     User findByEmail(String email);
 }

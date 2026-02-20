@@ -48,19 +48,19 @@ public class VolunteerPageController {
                 pending.add(app);
             }
 
-            // B. VIITOARE (Doar cele ACCEPTATE)
+
             else if ("ACCEPTED".equals(status) && start.isAfter(today)) {
                 upcoming.add(app);
             }
 
-            // C. ÎN DESFĂȘURARE (ACCEPTED + Perioada activă)
+
             else if ("ACCEPTED".equals(status) && !start.isAfter(today) && !end.isBefore(today)) {
                 ongoing.add(app);
             }
 
-            // D. ISTORIC (Data final a trecut)
+
             else if (end.isBefore(today)) {
-                // Aici intră și cele ACCEPTED, COMPLETED, sau chiar PENDING vechi
+
                 history.add(app);
             }
         }

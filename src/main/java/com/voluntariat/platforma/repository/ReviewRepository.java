@@ -8,17 +8,13 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
-    // Găsește recenziile unui eveniment (pentru a vedea ce zic voluntarii)
     List<Review> findByEventAndType(Event event, String type);
 
-    // Verifică dacă userul a dat deja recenzie la acest eveniment (să nu dea de 2 ori)
     boolean existsByReviewerAndEventAndType(User reviewer, Event event, String type);
 
     Optional<Review> findByReviewerAndEvent(User reviewer, Event event);
 
-    // 2. Găsește toate recenziile unui eveniment (pentru pagina de detalii)
     List<Review> findByEvent(Event event);
 
-    // 3. Găsește toate recenziile scrise de un voluntar (dacă ai nevoie la profil)
     List<Review> findByReviewer(User reviewer);
 }

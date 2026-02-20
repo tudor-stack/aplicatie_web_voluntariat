@@ -22,6 +22,8 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+
+    //Ne asiguram logarea in siguranta
     @Bean
     public UserDetailsService userDetailsService(UserRepository userRepository) {
         return email -> {
@@ -29,10 +31,7 @@ public class SecurityConfig {
             if (user == null) {
                 throw new UsernameNotFoundException("Utilizatorul nu a fost gasit: " + email);
             }
-            // MODIFICAREA 1: .toUpperCase()
-            // Transformam "Company" -> "COMPANY".
-            // Astfel, Spring va crea rolul "ROLE_COMPANY" indiferent cum e scris in baza de date.
-            return org.springframework.security.core.userdetails.User
+           return org.springframework.security.core.userdetails.User
                     .withUsername(user.getEmail())
                     .password(user.getPassword())
                     .roles(user.getRole().toUpperCase())
@@ -40,22 +39,22 @@ public class SecurityConfig {
         };
     }
 
+
+    //Regulile de acces de pagini pe site
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
+
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/register", "/login", "/css/**", "/js/**").permitAll()
-                        // MODIFICAREA 2: Reguli clare de acces
-                        // Doar cine are ROLE_COMPANY intra la /company/**
                         .requestMatchers("/company/**").hasRole("COMPANY")
-                        // Doar cine are ROLE_VOLUNTEER intra la /jobs sau aplicari
                         .requestMatchers("/jobs/**", "/volunteer/**").hasRole("VOLUNTEER") // SAU .hasAnyRole("VOLUNTEER", "COMPANY") daca si companiile au voie sa vada joburile
                         .anyRequest().authenticated()
-                )
+                )   //autorizarea cererilor, importiva IDOS
+
                 .formLogin(form -> form
                         .loginPage("/login")
-                        // MODIFICAREA 3: Redirecționare inteligentă (Logic Handler)
-                        // In loc sa ii trimitem pe toti la /jobs, verificam cine sunt.
                         .successHandler((request, response, authentication) -> {
                             var roles = authentication.getAuthorities();
                             String redirectUrl = "/jobs"; // Default pentru voluntari
@@ -68,7 +67,8 @@ public class SecurityConfig {
                             response.sendRedirect(redirectUrl);
                         })
                         .permitAll()
-                )
+                )// autorizarea login-ului, by default e voluntar
+
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout")
@@ -76,12 +76,15 @@ public class SecurityConfig {
                         .clearAuthentication(true)
                         .deleteCookies("JSESSIONID")
                         .permitAll()
-                )
+                )// eliminam sesiunea
+
+
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                         .maximumSessions(1)
                         .expiredUrl("/login?expired")
-                );
+                ); // maxim o sesiune
+
 
         return http.build();
     }
