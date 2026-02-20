@@ -26,7 +26,7 @@ The Volunteering Management Platform provides a comprehensive solution for organ
 
 ### Backend
 - **Framework**: Spring Boot
-- **Language**: Java (62.1% of codebase)
+- **Language**: Java (54.0% of codebase)
 - **Dependencies**:
   - Spring Boot Web
   - Spring Data JPA
@@ -34,7 +34,7 @@ The Volunteering Management Platform provides a comprehensive solution for organ
 - **Build Tool**: Maven (with Maven Wrapper included)
 
 ### Frontend
-- **Languages**: HTML5 (36.4%), JavaScript (1.5%), CSS3
+- **Languages**: HTML5 (41.7%), JavaScript (4.3%), CSS3
 - **Architecture**: Server-side rendered templates with dynamic JavaScript enhancements
 
 ### Database
