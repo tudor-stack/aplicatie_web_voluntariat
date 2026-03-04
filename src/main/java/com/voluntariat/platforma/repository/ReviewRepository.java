@@ -8,13 +8,12 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
-    List<Review> findByEventAndType(Event event, String type);
-
-    boolean existsByReviewerAndEventAndType(User reviewer, Event event, String type);
+    List<Review> findByEventAndReviewer_Role(Event event, String role);
+    boolean existsByReviewerAndEvent(User reviewer, Event event);
 
     Optional<Review> findByReviewerAndEvent(User reviewer, Event event);
 
     List<Review> findByEvent(Event event);
-
+    List<Review> findByReviewedUser(User reviewedUser);
     List<Review> findByReviewer(User reviewer);
 }

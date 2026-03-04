@@ -23,23 +23,26 @@ public class Review {
     @JoinColumn(name = "reviewer_id")
     private User reviewer;
 
+    @ManyToOne
+    @JoinColumn(name="reviewed_user_id")
+    private User reviewedUser;
+
     // Evenimentul asociat (contextul)
     @ManyToOne
     @JoinColumn(name = "event_id")
     private Event event;
 
     // Tipul recenziei: "FROM_VOLUNTEER" sau "FROM_COMPANY"
-    private String type;
+
 
     public Review() {}
 
-    public Review(int rating, String comment, User reviewer, Event event, String type) {
+    public Review(int rating, String comment, User reviewer, User reviewedUser, Event event) {
         this.rating = rating;
         this.comment = comment;
         this.reviewer = reviewer;
+        this.reviewedUser = reviewedUser;
         this.event = event;
-        this.type = type;
-        this.date = LocalDateTime.now();
     }
 
     // Getters & Setters standard
@@ -55,8 +58,7 @@ public class Review {
     public void setReviewer(User reviewer) { this.reviewer = reviewer; }
     public Event getEvent() { return event; }
     public void setEvent(Event event) { this.event = event; }
-    public String getType() { return type; }
-    public void setType(String type) { this.type = type; }
-
+    public User  getReviewedUser() { return reviewedUser; }
+    public void setReviewedUser(User reviewedUser) { this.reviewedUser = reviewedUser; }
 
 }

@@ -26,70 +26,79 @@ public class ReviewController {
     @Autowired private UserRepository userRepository;
     @Autowired private VolunteerApplicationRepository applicationRepository;
 
-    // ==========================================
-    // 1. VOLUNTARUL DĂ RECENZIE EVENIMENTULUI
-    // ==========================================
+    // ----------------------------------------------------
+    // METODĂ PRIVATĂ (Principiul DRY)
+    // ----------------------------------------------------
+    private User getCurrentUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return userRepository.findByEmail(auth.getName());
+    }
 
+    // ==========================================
+    // 1. VOLUNTARUL DĂ RECENZIE EVENIMENTULUI / COMPANIEI
+    // ==========================================
     @GetMapping("/volunteer/review-event/{eventId}")
     public String showVolunteerReviewForm(@PathVariable Long eventId, Model model) {
-        // 1. Identificam voluntarul logat
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User volunteer = userRepository.findByEmail(auth.getName());
+        User volunteer = getCurrentUser();
+        Event event = eventRepository.findById(eventId).orElse(null);
 
-        Optional<Event> eventOpt = eventRepository.findById(eventId);
+        if (event == null) return "redirect:/my-events";
 
-        if (eventOpt.isPresent()) {
-            Event event = eventOpt.get();
-            model.addAttribute("event", event);
-            model.addAttribute("targetName", "evenimentul: " + event.getTitle());
-            // Setăm unde se va trimite formularul
-            model.addAttribute("postUrl", "/volunteer/submit-review/" + eventId);
-
-            // 2. Verificăm dacă există deja o recenzie (Edit Mode vs Create Mode)
-            Optional<Review> existingReview = reviewRepository.findByReviewerAndEvent(volunteer, event);
-
-            if (existingReview.isPresent()) {
-                // UPDATE: Trimitem obiectul existent în HTML
-                model.addAttribute("review", existingReview.get());
-                model.addAttribute("isEdit", true);
-            } else {
-                // CREATE: Trimitem un obiect gol
-                Review newReview = new Review();
-                newReview.setRating(5); // Default 5 stele
-                model.addAttribute("review", newReview);
-                model.addAttribute("isEdit", false);
-            }
-            return "review_form";
+        // SECURITATE (Prevenire IDOR): A participat voluntarul la acest eveniment?
+        Optional<VolunteerApplication> app = applicationRepository.findByVolunteerAndEvent(volunteer, event);
+        if (app.isEmpty() || !"ACCEPTED".equals(app.get().getStatus())) {
+            return "redirect:/my-events?error=unauthorized_review"; // N-ai fost la eveniment, nu poți da review!
         }
-        return "redirect:/my-events";
+
+        model.addAttribute("event", event);
+        model.addAttribute("targetName", "evenimentul: " + event.getTitle());
+        model.addAttribute("postUrl", "/volunteer/submit-review/" + eventId);
+
+        Optional<Review> existingReview = reviewRepository.findByReviewerAndEvent(volunteer, event);
+
+        if (existingReview.isPresent()) {
+            model.addAttribute("review", existingReview.get());
+            model.addAttribute("isEdit", true);
+        } else {
+            Review newReview = new Review();
+            newReview.setRating(5);
+            model.addAttribute("review", newReview);
+            model.addAttribute("isEdit", false);
+        }
+        return "review_form";
     }
 
     @PostMapping("/volunteer/submit-review/{eventId}")
     public String submitVolunteerReview(@PathVariable Long eventId, @ModelAttribute Review reviewForm) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User volunteer = userRepository.findByEmail(auth.getName());
+        User volunteer = getCurrentUser();
         Event event = eventRepository.findById(eventId).orElse(null);
 
         if (event != null) {
+            // SECURITATE Dublă la Submit
+            Optional<VolunteerApplication> app = applicationRepository.findByVolunteerAndEvent(volunteer, event);
+            if (app.isEmpty() || !"ACCEPTED".equals(app.get().getStatus())) {
+                return "redirect:/my-events?error=unauthorized_review";
+            }
+
             Optional<Review> existingReview = reviewRepository.findByReviewerAndEvent(volunteer, event);
 
             if (existingReview.isPresent()) {
-                // --- LOGICA DE UPDATE (Folosim Setters) ---
                 Review dbReview = existingReview.get();
                 dbReview.setRating(reviewForm.getRating());
-                dbReview.setComment(reviewForm.getComment()); // Update la comentariu
-                dbReview.setDate(LocalDateTime.now()); // Update la dată
+                dbReview.setComment(reviewForm.getComment());
+                dbReview.setDate(LocalDateTime.now());
                 reviewRepository.save(dbReview);
             } else {
-                // --- LOGICA DE CREATE (Folosim Constructorul Tău) ---
+                // UPDATE: Nu mai avem type. Destinatarul este User-ul care deține compania organizatoare
+                User companyOwner = event.getCompany().getUser();
+
                 Review newReview = new Review(
                         reviewForm.getRating(),
                         reviewForm.getComment(),
-                        volunteer,  // reviewer
-                        event,      // event
-                        "FROM_VOLUNTEER" // type
+                        volunteer,      // Autor: Voluntarul
+                        companyOwner,   // Destinatar: Proprietarul ONG-ului
+                        event           // Context: Evenimentul
                 );
-                // Constructorul setează automat data la LocalDateTime.now(), deci e perfect.
                 reviewRepository.save(newReview);
             }
         }
@@ -99,17 +108,21 @@ public class ReviewController {
     // ==========================================
     // 2. COMPANIA DĂ RECENZIE VOLUNTARULUI
     // ==========================================
-
     @GetMapping("/company/review-volunteer/{appId}")
     public String showCompanyReviewForm(@PathVariable Long appId, Model model) {
+        User companyUser = getCurrentUser();
         VolunteerApplication app = applicationRepository.findById(appId).orElse(null);
-        if(app == null) return "redirect:/company/dashboard";
+
+        // SECURITATE: Există aplicația? Aparține de un eveniment deținut de MINE?
+        if(app == null || !app.getEvent().getCompany().getUser().getId().equals(companyUser.getId())) {
+            return "redirect:/company/dashboard?error=unauthorized_review";
+        }
 
         model.addAttribute("event", app.getEvent());
         model.addAttribute("targetName", "voluntarul " + app.getVolunteer().getFirstName());
         model.addAttribute("postUrl", "/company/submit-review/" + appId);
 
-        // La companii simplificăm momentan (doar Create), dar poți extinde logică de mai sus
+        // Aici am putea adăuga logica de Edit la fel ca la Voluntari pe viitor
         Review review = new Review();
         review.setRating(5);
         model.addAttribute("review", review);
@@ -120,21 +133,18 @@ public class ReviewController {
 
     @PostMapping("/company/submit-review/{appId}")
     public String submitCompanyReview(@PathVariable Long appId, @ModelAttribute Review reviewForm) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User companyUser = userRepository.findByEmail(auth.getName());
+        User companyUser = getCurrentUser();
         VolunteerApplication app = applicationRepository.findById(appId).orElse(null);
 
-        if (app != null) {
-            // Folosim Constructorul pentru a crea recenzia companiei
-            // Adăugăm un detaliu în comment despre cine e voluntarul vizat
-            String fullComment = reviewForm.getComment() + " [Voluntar vizat: " + app.getVolunteer().getEmail() + "]";
+        // SECURITATE la Submit
+        if (app != null && app.getEvent().getCompany().getUser().getId().equals(companyUser.getId())) {
 
             Review newReview = new Review(
                     reviewForm.getRating(),
-                    fullComment,
-                    companyUser,      // reviewer (compania)
-                    app.getEvent(),   // event (contextul)
-                    "FROM_COMPANY"    // type
+                    reviewForm.getComment(),
+                    companyUser,
+                    app.getVolunteer(),
+                    app.getEvent()
             );
 
             reviewRepository.save(newReview);

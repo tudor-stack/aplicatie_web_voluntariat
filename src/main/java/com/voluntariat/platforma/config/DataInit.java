@@ -60,7 +60,7 @@ public class DataInit {
                 );
                 companyRepository.save(comp1);
 
-                // --- Companie 2: Green Earth ONG (ong@green.ro) ---
+                // --- Companie 2: Green Earth ONG ---
                 User uOrg2 = new User("ong@green.ro", passwordEncoder.encode("parola123"), "Elena", "Verdes", "Company");
                 userRepository.save(uOrg2);
 
@@ -91,48 +91,33 @@ public class DataInit {
                 profileRepository.save(prof2);
 
                 // ==========================================
-                // 4. EVENIMENTE (Viitoare si Trecute)
+                // 4. EVENIMENTE
                 // ==========================================
 
-                // >>>>>> MODIFICAREA CERUTĂ AICI <<<<<<
-                // Eveniment programat pentru MÂINE (ong@green.ro / comp2)
-                Event evTomorrow = new Event(
-                        "Actiune Urgenta Ecologizare",
-                        "Curatenie generala in parc. Avem nevoie de oameni maine!",
-                        LocalDate.now().plusDays(1), // START: Maine
-                        LocalDate.now().plusDays(1), // FINAL: Tot Maine
-                        comp2 // Asociat cu ong@green.ro
-                );
+                Event evTomorrow = new Event("Actiune Urgenta Ecologizare", "Curatenie generala in parc. Avem nevoie de oameni maine!", LocalDate.now().plusDays(1), LocalDate.now().plusDays(1), comp2);
                 evTomorrow.setCategory(catMediu);
                 evTomorrow.setDuration("4 Ore");
                 eventRepository.save(evTomorrow);
-                // >>>>>> FINAL MODIFICARE <<<<<<
 
-
-                // --- VIITOR 1: Hackathon (Peste 10 zile) ---
                 Event evFuture1 = new Event("Hackathon Caritabil 2026", "Codam 48 de ore pentru comunitate.", LocalDate.now().plusDays(10), LocalDate.now().plusDays(12), comp1);
                 evFuture1.setCategory(catEducatie);
                 evFuture1.setDuration("48 Ore");
                 eventRepository.save(evFuture1);
 
-                // --- VIITOR 2: Plantare (Peste 3 zile) ---
                 Event evFuture2 = new Event("Plantare Copaci Brasov", "Aer curat si fapte bune.", LocalDate.now().plusDays(3), LocalDate.now().plusDays(3), comp2);
                 evFuture2.setCategory(catMediu);
                 evFuture2.setDuration("6 Ore");
                 eventRepository.save(evFuture2);
 
-                // --- TRECUT 1: Maraton (Acum 20 zile) ---
                 Event evPast1 = new Event("Maratonul Padurii", "Am alergat pentru natura.", LocalDate.now().minusDays(20), LocalDate.now().minusDays(20), comp2);
                 evPast1.setCategory(catSport);
                 evPast1.setDuration("4 Ore");
                 eventRepository.save(evPast1);
 
-                // --- TRECUT 2: Workshop IT (Acum 2 luni) ---
                 Event evPast2 = new Event("Workshop Intro IT", "Curs gratuit pentru elevi.", LocalDate.now().minusMonths(2), LocalDate.now().minusMonths(2), comp1);
                 evPast2.setCategory(catEducatie);
                 evPast2.setDuration("2 Ore");
                 eventRepository.save(evPast2);
-
 
                 // ==========================================
                 // 5. APLICATII
@@ -153,12 +138,30 @@ public class DataInit {
                 applicationRepository.save(app4);
 
                 // ==========================================
-                // 6. RECENZII
+                // 6. RECENZII (Refactorizate conform noului Model)
                 // ==========================================
-                Review rev1 = new Review(5, "A fost superb! Organizare de nota 10.", vol1, evPast1, "FROM_VOLUNTEER");
-                reviewRepository.save(rev1);
 
-                System.out.println(">>> POPULARE COMPLETA: Eveniment 'Actiune Urgenta' adaugat pentru maine! <<<");
+                // Cazul A: Voluntarul (Ion) dă recenzie Companiei (Green Earth) pentru Maratonul Padurii
+                Review revFromVol = new Review(
+                        5,
+                        "A fost superb! Organizare de nota 10.",
+                        vol1,   // Autor: Ion Popescu
+                        uOrg2,  // Destinatar: Elena Verdes (Green Earth ONG)
+                        evPast1 // Eveniment: Maratonul Padurii
+                );
+                reviewRepository.save(revFromVol);
+
+                // Cazul B: Compania (Tech Solutions) dă recenzie Voluntarului (Maria) pentru Workshop IT
+                Review revFromComp = new Review(
+                        4,
+                        "Maria a fost foarte proactiva si ne-a ajutat enorm cu pozele.",
+                        uOrg1,  // Autor: Andrei Managerescu (Tech Solutions)
+                        vol2,   // Destinatar: Maria Ionescu
+                        evPast2 // Eveniment: Workshop Intro IT
+                );
+                reviewRepository.save(revFromComp);
+
+                System.out.println(">>> POPULARE COMPLETA: Noua arhitectura de recenzii a fost implementata cu succes! <<<");
 
             } catch (Exception e) {
                 System.err.println("!!! EROARE CRITICA LA INITIALIZARE: " + e.getMessage());
