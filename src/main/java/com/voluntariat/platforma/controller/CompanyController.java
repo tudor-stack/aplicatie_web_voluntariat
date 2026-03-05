@@ -1,9 +1,6 @@
 package com.voluntariat.platforma.controller;
 
-import com.voluntariat.platforma.model.Company;
-import com.voluntariat.platforma.model.Event;
-import com.voluntariat.platforma.model.User;
-import com.voluntariat.platforma.model.VolunteerApplication;
+import com.voluntariat.platforma.model.*;
 import com.voluntariat.platforma.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -14,7 +11,8 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @Controller
@@ -63,14 +61,17 @@ public class CompanyController {
         }
 
         List<VolunteerApplication> confirmedVolunteers = applicationRepository.findByEventAndStatus(event,"ACCEPTED");
-        List<Long> reviewedVolunteersIds=reviewRepository.findByEvent(event).stream()
-                .filter(r->r.getReviewer().getId().equals(currentCompany.getUser().getId()))
-                .map(r -> r.getReviewer().getId())
-                .toList();
+
+        List<Review> eventReviews=reviewRepository.findByEvent(event).stream()
+                        .filter(r->r.getReviewer().getId().equals(currentCompany.getUser().getId()))
+                                .toList();
 
 
-        model.addAttribute("reviewedVolunteerIds", reviewedVolunteersIds);
+        Map<Long,Review> volunteerReviewsMap=eventReviews.stream()
+                        .collect(Collectors.toMap(r->r.getReviewedUser().getId(), r->r));
 
+
+        model.addAttribute("volunteerReviewsMap", volunteerReviewsMap);
         model.addAttribute("event",event);
         model.addAttribute("participants", confirmedVolunteers);
         return "attendance_list";

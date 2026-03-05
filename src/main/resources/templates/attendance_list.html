@@ -20,8 +20,7 @@
             <th>NUme Voluntar</th>
             <th>Telefon</th>
             <th>Email</th>
-            <th>Semnătură</th>
-            <th class="text-center">Recenzie</th>
+            <th class="text-center" style="width: 300px;">Evaluare Voluntar</th>
         </tr>
         </thead>
         <tbody>
@@ -37,18 +36,27 @@
                                   th:text="${app.volunteer.volunteerProfile.phoneNumber}">-</span>
             </td>
             <td th:text="${app.volunteer.email}">email</td>
-            <td class="text-center">
-                <a th:if="${!reviewedVolunteerIds.contains(app.volunteer.id)}"
-                   th:href="@{/company/review-volunteer/{appId}(appId=${app.id})}"
-                   class="btn btn-sm btn-outline-warning fw-bold">
-                    ⭐ Notează
-                </a>
+            <td class="text-center align-middle">
+                <div th:with="review=${volunteerReviewsMap.get(app.volunteer.id)}">
 
-                <a th:if="${reviewedVolunteerIds.contains(app.volunteer.id)}"
-                   th:href="@{/company/review-volunteer/{appId}(appId=${app.id})}"
-                   class="btn btn-sm btn-outline-info fw-bold">
-                    ✏️ Editează
-                </a>
+                    <a th:if="${review == null}"
+                       th:href="@{/company/review-volunteer/{appId}(appId=${app.id})}"
+                       class="btn btn-sm btn-outline-warning fw-bold">
+                        ⭐ Notează
+                    </a>
+
+                    <div th:if="${review != null}" class="text-start bg-light p-2 rounded border">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="badge bg-warning text-dark fw-bold" th:text="${review.rating + ' / 5 ⭐'}"></span>
+                            <a th:href="@{/company/review-volunteer/{appId}(appId=${app.id})}"
+                               class="btn btn-xs btn-outline-primary py-0" style="font-size: 0.8rem;">
+                                ✏️ Editează
+                            </a>
+                        </div>
+                        <p class="small mb-0 text-muted fst-italic text-truncate" style="max-width: 250px;" th:title="${review.comment}" th:text="${review.comment}"></p>
+                    </div>
+
+                </div>
             </td>
         </tr>
         </tbody>
