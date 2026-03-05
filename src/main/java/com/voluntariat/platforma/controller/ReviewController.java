@@ -113,20 +113,29 @@ public class ReviewController {
         User companyUser = getCurrentUser();
         VolunteerApplication app = applicationRepository.findById(appId).orElse(null);
 
-        // SECURITATE: Există aplicația? Aparține de un eveniment deținut de MINE?
-        if(app == null || !app.getEvent().getCompany().getUser().getId().equals(companyUser.getId())) {
+       if(app == null || !app.getEvent().getCompany().getUser().getId().equals(companyUser.getId())) {
             return "redirect:/company/dashboard?error=unauthorized_review";
         }
+
+       Event event=app.getEvent();
+       User volunteer = app.getVolunteer();
 
         model.addAttribute("event", app.getEvent());
         model.addAttribute("targetName", "voluntarul " + app.getVolunteer().getFirstName());
         model.addAttribute("postUrl", "/company/submit-review/" + appId);
 
-        // Aici am putea adăuga logica de Edit la fel ca la Voluntari pe viitor
-        Review review = new Review();
-        review.setRating(5);
-        model.addAttribute("review", review);
-        model.addAttribute("isEdit", false);
+        Optional<Review> existingReview = reviewRepository.findByReviewerAndReviewedUserAndEvent(companyUser, volunteer, event);
+
+        if(existingReview.isPresent()) {
+            model.addAttribute("review", existingReview.get());
+            model.addAttribute("isEdit", true);
+        }
+        else{
+            Review newReview = new Review();
+            newReview.setRating(5);
+            model.addAttribute("review", newReview);
+            model.addAttribute("isEdit", false);
+        }
 
         return "review_form";
     }
@@ -136,18 +145,36 @@ public class ReviewController {
         User companyUser = getCurrentUser();
         VolunteerApplication app = applicationRepository.findById(appId).orElse(null);
 
-        // SECURITATE la Submit
         if (app != null && app.getEvent().getCompany().getUser().getId().equals(companyUser.getId())) {
 
-            Review newReview = new Review(
-                    reviewForm.getRating(),
-                    reviewForm.getComment(),
-                    companyUser,
-                    app.getVolunteer(),
-                    app.getEvent()
-            );
+            Event event=app.getEvent();
+            User volunteer = app.getVolunteer();
 
-            reviewRepository.save(newReview);
+            Optional<Review> existingReview = reviewRepository.findByReviewerAndReviewedUserAndEvent(companyUser, volunteer, event);
+
+            if(existingReview.isPresent()) {
+                Review dbReview = existingReview.get();
+                dbReview.setRating(reviewForm.getRating());
+                dbReview.setComment(reviewForm.getComment());
+                dbReview.setDate(LocalDateTime.now());
+
+                reviewRepository.save(dbReview);
+            }
+            else{
+                Review newReview = new Review();
+                newReview.setRating(reviewForm.getRating());
+                newReview.setComment(reviewForm.getComment());
+                newReview.setDate(LocalDateTime.now());
+
+                newReview.setReviewer(companyUser);
+                newReview.setEvent(event);
+                newReview.setReviewedUser(volunteer);
+
+                reviewRepository.save(newReview);
+            }
+
+
+
         }
         return "redirect:/company/dashboard?reviewed";
     }

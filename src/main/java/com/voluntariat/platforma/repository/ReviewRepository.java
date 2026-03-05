@@ -10,7 +10,7 @@ import java.util.Optional;
 public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findByEventAndReviewer_Role(Event event, String role);
     boolean existsByReviewerAndEvent(User reviewer, Event event);
-
+    Optional<Review> findByReviewerAndReviewedUserAndEvent(User reviewer, User reviewedUser, Event event);
     Optional<Review> findByReviewerAndEvent(User reviewer, Event event);
 
     List<Review> findByEvent(Event event);

@@ -12,7 +12,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+
+
 
 @Controller
 public class CompanyController {
@@ -26,6 +29,8 @@ public class CompanyController {
     private VolunteerApplicationRepository applicationRepository;
     @Autowired
     private CategoryRepository categoryRepository;
+    @Autowired
+    private ReviewRepository reviewRepository;
 
     private Company getCurrentCompany() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -57,10 +62,19 @@ public class CompanyController {
             return "redirect:/company/dashboard?error=access_denied";
         }
 
-        List<VolunteerApplication> confirmedVolunteers = applicationRepository.findByEventAndStatus(event, "ACCEPTED");
-        model.addAttribute("event", event);
+        List<VolunteerApplication> confirmedVolunteers = applicationRepository.findByEventAndStatus(event,"ACCEPTED");
+        List<Long> reviewedVolunteersIds=reviewRepository.findByEvent(event).stream()
+                .filter(r->r.getReviewer().getId().equals(currentCompany.getUser().getId()))
+                .map(r -> r.getReviewer().getId())
+                .toList();
+
+
+        model.addAttribute("reviewedVolunteerIds", reviewedVolunteersIds);
+
+        model.addAttribute("event",event);
         model.addAttribute("participants", confirmedVolunteers);
         return "attendance_list";
+
     }
 
     @GetMapping("/company/dashboard")

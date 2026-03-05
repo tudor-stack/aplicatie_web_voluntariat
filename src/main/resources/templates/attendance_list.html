@@ -37,12 +37,19 @@
                                   th:text="${app.volunteer.volunteerProfile.phoneNumber}">-</span>
             </td>
             <td th:text="${app.volunteer.email}">email</td>
-            <td></td> <td class="text-center">
-            <a th:href="@{/company/review-volunteer/{appId}(appId=${app.id})}"
-               class="btn btn-sm btn-outline-warning fw-bold">
-                ⭐ Notează
-            </a>
-        </td>
+            <td class="text-center">
+                <a th:if="${!reviewedVolunteerIds.contains(app.volunteer.id)}"
+                   th:href="@{/company/review-volunteer/{appId}(appId=${app.id})}"
+                   class="btn btn-sm btn-outline-warning fw-bold">
+                    ⭐ Notează
+                </a>
+
+                <a th:if="${reviewedVolunteerIds.contains(app.volunteer.id)}"
+                   th:href="@{/company/review-volunteer/{appId}(appId=${app.id})}"
+                   class="btn btn-sm btn-outline-info fw-bold">
+                    ✏️ Editează
+                </a>
+            </td>
         </tr>
         </tbody>
     </table>
