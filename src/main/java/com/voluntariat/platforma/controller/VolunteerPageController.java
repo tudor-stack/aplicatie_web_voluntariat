@@ -1,7 +1,9 @@
 package com.voluntariat.platforma.controller;
 
+import com.voluntariat.platforma.model.Review;
 import com.voluntariat.platforma.model.User;
 import com.voluntariat.platforma.model.VolunteerApplication;
+import com.voluntariat.platforma.repository.ReviewRepository;
 import com.voluntariat.platforma.repository.UserRepository;
 import com.voluntariat.platforma.repository.VolunteerApplicationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +15,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 public class VolunteerPageController {
@@ -23,6 +28,9 @@ public class VolunteerPageController {
 
     @Autowired
     private VolunteerApplicationRepository applicationRepository;
+
+    @Autowired
+    private ReviewRepository reviewRepository;
 
     @GetMapping("/my-events")
     public String showMyEvents(Model model) {
@@ -42,33 +50,33 @@ public class VolunteerPageController {
             String status=app.getStatus();
             LocalDate start = app.getEvent().getStartDate();
             LocalDate end = app.getEvent().getEndDate();
-
-
             if ("PENDING".equals(status) && start.isAfter(today.minusDays(1))) {
                 pending.add(app);
             }
-
-
             else if ("ACCEPTED".equals(status) && start.isAfter(today)) {
                 upcoming.add(app);
             }
-
-
             else if ("ACCEPTED".equals(status) && !start.isAfter(today) && !end.isBefore(today)) {
                 ongoing.add(app);
             }
-
-
             else if (end.isBefore(today)) {
 
                 history.add(app);
             }
         }
+        List<Review> receivedReviews= reviewRepository.findByReviewedUser(user);
+
+        Map<Long,Review> reviewsReceivedMap=receivedReviews.stream()
+                        .collect(Collectors.toMap(r->r.getEvent().getId(), r->r));
+
         model.addAttribute("pendingApps",pending);
         model.addAttribute("upcomingApps",upcoming);
         model.addAttribute("ongoingApps",ongoing);
         model.addAttribute("historyApps",history);
         model.addAttribute("userName",user.getFirstName());
+
+        model.addAttribute("reviewsReceivedMap", reviewsReceivedMap);
+
         return "my_events";
     }
 }
